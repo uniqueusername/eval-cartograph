@@ -1,9 +1,9 @@
 import { UMAP } from 'umap-js'
 
-const DATA_PATH: string = "/../public/data/matrix.csv"
-const OUTPUT_PATH: string = "/../public/data/embedding.csv"
+const DATA_PATH: string = "/../static/matrix.csv"
+const OUTPUT_PATH: string = "/../static/embedding.csv"
 
-const data_string: string = await Bun.file(import.meta.dir + "/../data/matrix.csv").text()
+const data_string: string = await Bun.file(import.meta.dir + DATA_PATH).text()
 const data: number[][] = data_string.trim().split('\n').map(row => row.split(',').map(Number))
 
 const umap: UMAP = new UMAP({ nComponents: 3 })
