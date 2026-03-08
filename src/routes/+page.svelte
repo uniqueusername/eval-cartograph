@@ -6,17 +6,16 @@
 
 <div class="w-full h-screen">
 	<Canvas>
-		<T.PerspectiveCamera makeDefault position={[0, 0, 10]}>
-			<OrbitControls />
-		</T.PerspectiveCamera>
+		<T.OrthographicCamera makeDefault position={[data.camera_init_pos.x, data.camera_init_pos.y, data.camera_init_pos.z]}>
+			<OrbitControls target={[data.centroid.x, data.centroid.y, data.centroid.z]} />
+		</T.OrthographicCamera>
 
 		<T.AmbientLight intensity={1} />
 
-		{#each data.points as point}
-    		<Billboard><Text text="+" position={[point.x, point.y, point.z]} fontSize={1} color="black" /></Billboard>
+		{#each data.points as point} -->
+    		<Billboard position={[point.x, point.y, point.z]}>
+                <Text text="+" fontSize={15} color="black" />
+            </Billboard>
 		{/each}
-		<!-- <Billboard><Text text="+" position={[1, 2, 0]} fontSize={1} color="black" /></Billboard>
-		<Billboard><Text text="+" position={[-2, -2, 3]} fontSize={1} color="black" /></Billboard>
-		<Billboard><Text text="+" position={[1, 2, 3]} fontSize={1} color="black" /></Billboard>` -->
 	</Canvas>
 </div>
