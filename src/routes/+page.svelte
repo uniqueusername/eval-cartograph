@@ -10,11 +10,13 @@
 			<OrbitControls target={[data.centroid.x, data.centroid.y, data.centroid.z]} />
 		</T.OrthographicCamera>
 
-		<T.AmbientLight intensity={1} />
+
+		<T.Fog attach="fog" color={"black"} near={0} far={3000} />
+		<!-- <T.FogExp2 attach="fog" color={"black"} density={0.0005} /> -->
 
 		{#each data.points as point}
 			<Billboard position={[point.x, point.y, point.z]}>
-                <Text text="+" fontSize={15} {color} />
+                <Text text="+" fontSize={15} color={"white"} />
             </Billboard>
 		{/each}
 	</Canvas>

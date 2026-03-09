@@ -3,7 +3,7 @@ export const load = async ({ fetch }) => {
   const CLOUD_SCALE = 300
   const CAMERA_DISTANCE = 1000
 
-  const res = await fetch("/embedding.csv")
+  const res = await fetch("/embedding2.csv")
   const text = await res.text()
 
   const points = text.trim().split('\n').map(row => {
