@@ -4,7 +4,7 @@ const DATA_PATH = process.argv[2]
 const OUTPUT_PATH = process.argv[3]
 
 if (!DATA_PATH || !OUTPUT_PATH) {
-  console.error("Usage: bun run preprocess.ts <input.csv> <output.csv>")
+  console.error("usage: bun run preprocess.ts <input.csv> <output.csv>")
   process.exit(1)
 }
 
