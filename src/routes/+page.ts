@@ -1,7 +1,7 @@
 export const load = async ({ fetch }) => {
 
   const CLOUD_SCALE = 300
-  const CAMERA_DISTANCE = 1000
+  const CAMERA_DISTANCE = 500
 
   const res = await fetch("/embedding2.csv")
   const text = await res.text()
@@ -25,11 +25,17 @@ export const load = async ({ fetch }) => {
     z: sum_of_points.z / points.length,
   }
 
+  const centered_points = points.map(p => ({
+    x: p.x - centroid.x,
+    y: p.y - centroid.y,
+    z: p.z - centroid.z,
+  }))
+
   const camera_init_pos = {
-    x: centroid.x + CAMERA_DISTANCE,
-    y: centroid.y,
-    z: centroid.z + CAMERA_DISTANCE,
+    x: CAMERA_DISTANCE,
+    y: CAMERA_DISTANCE,
+    z: CAMERA_DISTANCE,
   }
 
-  return { points, centroid, camera_init_pos }
+  return { points: centered_points, camera_init_pos }
 }
