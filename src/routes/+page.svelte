@@ -13,6 +13,8 @@
   <Canvas>
     <T.OrthographicCamera
       makeDefault
+      near={-50000}
+      far={50000}
       position={[
         data.camera_init_pos.x,
         data.camera_init_pos.y,
@@ -25,15 +27,15 @@
     <!-- <T.FogExp2 attach="fog" color={fogColor} density={0.0008} /> -->
 
     <T.Mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
-      <T.CylinderGeometry args={[0.5, 0.5, 10000]} />
+      <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
       <T.MeshBasicMaterial color="#444444" />
     </T.Mesh>
     <T.Mesh position={[0, 0, 0]}>
-      <T.CylinderGeometry args={[0.5, 0.5, 10000]} />
+      <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
       <T.MeshBasicMaterial color="#444444" />
     </T.Mesh>
     <T.Mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-      <T.CylinderGeometry args={[0.5, 0.5, 10000]} />
+      <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
       <T.MeshBasicMaterial color="#444444" />
     </T.Mesh>
 
