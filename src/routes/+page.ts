@@ -1,23 +1,21 @@
+import { parseMatrix, computeEmbedding } from "$lib/umap"
+
 export const load = async ({ fetch }) => {
   const CLOUD_SCALE = 300
   const CAMERA_DISTANCE = 500
 
-  const res = await fetch("/embedding2.csv")
+  const res = await fetch("/matrix2.csv")
   const text = await res.text()
 
-  const points = text
-    .trim()
-    .split("\n")
-    .slice(1)
-    .map((row) => {
-      const [model, x, y, z] = row.split(",")
-      return {
-        model,
-        x: CLOUD_SCALE * Number(x),
-        y: CLOUD_SCALE * Number(y),
-        z: CLOUD_SCALE * Number(z),
-      }
-    })
+  const { modelNames, data } = parseMatrix(text)
+  const rawPoints = computeEmbedding(modelNames, data)
+
+  const points = rawPoints.map((p) => ({
+    model: p.model,
+    x: CLOUD_SCALE * p.x,
+    y: CLOUD_SCALE * p.y,
+    z: CLOUD_SCALE * p.z,
+  }))
 
   const sum_of_points = points.reduce(
     (a, b) => ({
