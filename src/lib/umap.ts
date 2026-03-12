@@ -14,8 +14,15 @@ export function parseMatrix(csv: string): { modelNames: string[]; data: number[]
   return { modelNames, data }
 }
 
+function seededRandom(seed: number): () => number {
+  return () => {
+    seed = (seed * 16807 + 0) % 2147483647
+    return (seed - 1) / 2147483646
+  }
+}
+
 export function computeEmbedding(modelNames: string[], data: number[][]): EmbeddingPoint[] {
-  const umap = new UMAP({ nComponents: 3 })
+  const umap = new UMAP({ nComponents: 3, random: seededRandom(42) })
   const embedding = umap.fit(data)
   return embedding.map((row, i) => ({
     model: modelNames[i],
