@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Canvas, T } from "@threlte/core"
   import { Billboard, OrbitControls, Text } from "@threlte/extras"
-  import { theme } from "$lib/theme"
+  import { colors } from "$lib/colors"
   import { CAMERA_DISTANCE, modelColor } from "$lib/points"
   import type { EmbeddingPoint } from "$lib/umap"
 
@@ -13,8 +13,9 @@
 
   let { points, modelNames, colorDots }: Props = $props()
 
-  const fogColor = $derived($theme ? "black" : "white")
-  const textColor = $derived($theme ? "white" : "black")
+  const fogColor = $derived($colors.fog)
+  const textColor = $derived($colors.text)
+  const axisColor = $derived($colors.axis)
 </script>
 
 <Canvas>
@@ -22,7 +23,7 @@
     makeDefault
     near={-50000}
     far={50000}
-    position={[CAMERA_DISTANCE, CAMERA_DISTANCE, CAMERA_DISTANCE]}
+    position={[CAMERA_DISTANCE*-2, CAMERA_DISTANCE, CAMERA_DISTANCE]}
   >
     <OrbitControls />
   </T.OrthographicCamera>
@@ -31,15 +32,15 @@
 
   <T.Mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
     <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
-    <T.MeshBasicMaterial color="#444444" />
+    <T.MeshBasicMaterial color={axisColor} />
   </T.Mesh>
   <T.Mesh position={[0, 0, 0]}>
     <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
-    <T.MeshBasicMaterial color="#444444" />
+    <T.MeshBasicMaterial color={axisColor} />
   </T.Mesh>
   <T.Mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
     <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
-    <T.MeshBasicMaterial color="#444444" />
+    <T.MeshBasicMaterial color={axisColor} />
   </T.Mesh>
 
   {#each points as point}

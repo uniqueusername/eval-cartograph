@@ -2,19 +2,74 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Design system: panel components */
-.panel {
-  @apply fixed z-50 rounded-lg border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-black/90 backdrop-blur-sm p-3 text-sm text-black dark:text-white shadow-lg;
+@font-face {
+  font-family: "Monaspace Neon";
+  src: url("/Monaspace Neon Var.ttf") format("truetype");
 }
 
-.panel-heading {
-  @apply mb-1 font-semibold text-xs uppercase tracking-wide;
+@theme {
+  --font-neon: "Monaspace Neon", monospace;
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-border: #444444;
+  --color-fog: #ffffff;
+  --color-axis: #444444;
+  --color-accent: #ff3388;
+  --color-accent-2: #444444;
 }
 
-.panel-checkbox-label {
-  @apply flex items-center gap-1.5 py-0.5 cursor-pointer;
+.dark {
+  --color-bg: #000000;
+  --color-text: #ffffff;
+  --color-border: #444444;
+  --color-fog: #000000;
+  --color-axis: #444444;
+  --color-accent: #ff3388;
+  --color-accent-2: #444444;
 }
 
-.panel-checkbox-text {
-  @apply truncate;
+@layer components {
+  .panel {
+    @apply border border-border bg-bg p-3 text-sm text-text;
+  }
+
+  .panel-heading {
+    @apply mb-1 font-semibold text-xs tracking-wide w-full flex items-center justify-between font-neon;
+  }
+
+  .panel-checkbox-label {
+    @apply flex w-full items-center py-1 mr-8 bg-transparent hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-[0.97] transition-transform duration-150 ease-out;
+  }
+
+  .panel-checkbox-label input[type="checkbox"] {
+    @apply appearance-none mx-2 size-3 rounded-full border border-accent shrink-0 bg-transparent checked:bg-accent;
+  }
+
+  .panel-collapsible {
+    @apply grid grid-rows-[0fr] transition-[grid-template-rows] duration-150 ease-out;
+
+    & ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    & ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    & ::-webkit-scrollbar-thumb {
+      background: var(--color-accent-2);
+      border-radius: 0;
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    .panel-collapsible {
+      scrollbar-color: var(--color-accent-2) transparent;
+      scrollbar-width: thin;
+    }
+  }
+
+  .panel-checkbox-text {
+    @apply lowercase font-neon whitespace-nowrap;
+  }
 }

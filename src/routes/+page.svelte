@@ -37,7 +37,7 @@
   }
 </script>
 
-<div class="w-full h-screen bg-white dark:bg-black">
+<div class="w-full h-screen bg-bg">
   <FilterPanel
     {modelNames}
     {evalNames}
