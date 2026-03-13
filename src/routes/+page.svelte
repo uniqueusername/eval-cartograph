@@ -46,7 +46,9 @@
     onchange={onFilterChange}
   />
 
-  <DebugPanel {colorPoints} onchange={() => (colorPoints = !colorPoints)} />
+  {#if __DEBUG__}
+    <DebugPanel {colorPoints} onchange={() => (colorPoints = !colorPoints)} />
+  {/if}
 
   <PointCloudScene {points} {modelNames} colorDots={colorPoints} />
 </div>

@@ -4,4 +4,7 @@ import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig({
   plugins: [sveltekit(), tailwindcss()],
+  define: {
+    __DEBUG__: JSON.stringify(!!process.env.VITE_DEBUG),
+  },
 })
