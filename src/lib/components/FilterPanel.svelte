@@ -28,38 +28,36 @@
   }
 </script>
 
-<div
-  class="fixed top-4 left-4 z-50 max-h-[90vh] overflow-y-auto rounded-lg border border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-black/90 backdrop-blur-sm p-3 text-sm text-black dark:text-white shadow-lg"
->
+<div class="panel top-4 left-4 max-h-[90vh] overflow-y-auto">
   <div class="flex gap-6">
-    <div class="min-w-[140px]">
-      <button class="mb-1 font-semibold text-xs uppercase tracking-wide">
+    <div class="min-w-35">
+      <button class="panel-heading">
         Models ({selectedModels.size}/{modelNames.length})
       </button>
       {#each modelNames as name}
-        <label class="flex items-center gap-1.5 py-0.5">
+        <label class="panel-checkbox-label">
           <input
             type="checkbox"
             checked={selectedModels.has(name)}
             onchange={() => toggleModel(name)}
           />
-          <span class="truncate">{name}</span>
+          <span class="panel-checkbox-text">{name}</span>
         </label>
       {/each}
     </div>
 
-    <div class="min-w-[140px]">
-      <button class="mb-1 font-semibold text-xs uppercase tracking-wide">
+    <div class="min-w-35">
+      <button class="panel-heading">
         Evals ({selectedEvals.size}/{evalNames.length})
       </button>
       {#each evalNames as name}
-        <label class="flex items-center gap-1.5 py-0.5">
+        <label class="panel-checkbox-label">
           <input
             type="checkbox"
             checked={selectedEvals.has(name)}
             onchange={() => toggleEval(name)}
           />
-          <span class="truncate">{name}</span>
+          <span class="panel-checkbox-text">{name}</span>
         </label>
       {/each}
     </div>
