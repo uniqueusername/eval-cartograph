@@ -69,7 +69,11 @@
     }
   }
 
-  .panel-checkbox-text {
+  .panel-title {
+    @apply font-semibold text-sm tracking-wide font-neon;
+  }
+
+  .panel-text {
     @apply lowercase font-neon whitespace-nowrap;
   }
 }

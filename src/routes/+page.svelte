@@ -4,6 +4,7 @@
   import FilterPanel from "$lib/components/FilterPanel.svelte"
   import DebugPanel from "$lib/components/DebugPanel.svelte"
   import PointCloudScene from "$lib/components/PointCloudScene.svelte"
+    import InfoPanel from "$lib/components/InfoPanel.svelte"
 
   let { data } = $props()
 
@@ -45,6 +46,8 @@
     {selectedEvals}
     onchange={onFilterChange}
   />
+
+  <InfoPanel />
 
   {#if __DEBUG__}
     <DebugPanel {colorPoints} onchange={() => (colorPoints = !colorPoints)} />
