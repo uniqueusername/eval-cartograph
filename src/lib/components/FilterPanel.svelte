@@ -82,11 +82,11 @@
   >
     <div class="overflow-hidden">
       <div
-        class="flex flex-col gap-2 px-2 pb-2 pt-2 max-h-[60vh] transition-transform duration-150 ease-out"
+        class="flex flex-col gap-2 px-2 pb-2 pt-2 h-[60vh] transition-transform duration-150 ease-out"
         class:translate-y-full={!mobileExpanded}
         class:translate-y-0={mobileExpanded}
       >
-        <div class="panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="panel flex-1 min-h-0 flex flex-col overflow-hidden">
           <div class="panel-heading">models</div>
           <div class="overflow-y-auto overflow-x-hidden flex-1">
             {#each modelNames as name}
@@ -101,7 +101,7 @@
             {/each}
           </div>
         </div>
-        <div class="panel flex-1 min-w-0 flex flex-col overflow-hidden">
+        <div class="panel flex-1 min-h-0 flex flex-col overflow-hidden">
           <div class="panel-heading">evals</div>
           <div class="overflow-y-auto overflow-x-hidden flex-1">
             {#each evalNames as name}
