@@ -82,7 +82,7 @@
   >
     <div class="overflow-hidden">
       <div
-        class="flex gap-2 px-2 pb-2 pt-2 max-h-[60vh] transition-transform duration-150 ease-out"
+        class="flex flex-col gap-2 px-2 pb-2 pt-2 max-h-[60vh] transition-transform duration-150 ease-out"
         class:translate-y-full={!mobileExpanded}
         class:translate-y-0={mobileExpanded}
       >
