@@ -7,4 +7,7 @@ export default defineConfig({
   define: {
     __DEBUG__: JSON.stringify(!!process.env.VITE_DEBUG),
   },
+  server: {
+    allowedHosts: [".ngrok-free.dev"],
+  },
 })

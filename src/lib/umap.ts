@@ -30,7 +30,11 @@ export function computeEmbedding(
   modelNames: string[],
   data: number[][],
 ): EmbeddingPoint[] {
-  const umap = new UMAP({ nComponents: 3, random: seededRandom(42) })
+  const umap = new UMAP({
+    nComponents: 3,
+    random: seededRandom(42),
+    nNeighbors: 4,
+  })
   const embedding = umap.fit(data)
   return embedding.map((row, i) => ({
     model: modelNames[i],

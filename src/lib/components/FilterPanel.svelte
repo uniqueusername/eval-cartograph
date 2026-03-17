@@ -45,7 +45,7 @@
               checked={selectedModels.has(name)}
               onchange={() => toggleModel(name)}
             />
-            <span class="panel-text">{name}</span>
+            <span class="panel-text">{name} [{modelNames.indexOf(name)}]</span>
           </label>
         {/each}
       </div>
@@ -96,7 +96,7 @@
                   checked={selectedModels.has(name)}
                   onchange={() => toggleModel(name)}
                 />
-                <span class="panel-text">{name}</span>
+                <span class="panel-text">{name} [{modelNames.indexOf(name)}]</span>
               </label>
             {/each}
           </div>

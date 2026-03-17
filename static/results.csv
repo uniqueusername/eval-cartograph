@@ -1,0 +1,9 @@
+,math500,mmmlu
+allenai/olmo-3-7b-instruct,-1.0896,-1.4465
+arcee-ai/trinity-mini,0.1173,-0.1305
+deepseek/deepseek-v3.2,0.2514,0.9133
+google/gemini-2.0-flash-lite-001,0.1173,-0.9473
+anthropic/claude-opus-4.6,0.6537,0.9133
+google/gemini-3-flash-preview,0.6537,0.9586
+openai/gpt-4.1-nano,-2.0282,-1.2196
+openai/gpt-5.2,1.3242,0.9586

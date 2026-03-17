@@ -28,7 +28,7 @@
     <OrbitControls />
   </T.OrthographicCamera>
 
-  <T.Fog attach="fog" color={fogColor} near={0} far={2000} />
+  <T.Fog attach="fog" color={fogColor} near={0} far={2500} />
 
   <T.Mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
     <T.CylinderGeometry args={[0.5, 0.5, 100000]} />
@@ -44,10 +44,9 @@
   </T.Mesh>
 
   {#each points as point}
-    {@const modelIdx = modelNames.indexOf(point.model)}
     <Billboard position={[point.x, point.y, point.z]}>
       <Text
-        text={colorDots ? String(modelIdx) : "+"}
+        text={colorDots ? String(modelNames.indexOf(point.model)) : "+"}
         fontSize={30}
         font="/Monaspace Neon Var.ttf"
         color={colorDots ? modelColor(point.model) : textColor}

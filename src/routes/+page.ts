@@ -1,7 +1,7 @@
 import { parseMatrix } from "$lib/umap"
 
 export const load = async ({ fetch }) => {
-  const res = await fetch("/matrix2.csv")
+  const res = await fetch("/results.csv")
   const text = await res.text()
 
   const { modelNames, evalNames, data } = parseMatrix(text)
