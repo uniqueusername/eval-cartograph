@@ -2,16 +2,16 @@
   import { Canvas, T } from "@threlte/core"
   import { Billboard, OrbitControls, Text } from "@threlte/extras"
   import { colors } from "$lib/colors"
-  import { CAMERA_DISTANCE, modelColor } from "$lib/points"
+  import { CAMERA_DISTANCE } from "$lib/points"
   import type { EmbeddingPoint } from "$lib/umap"
 
   interface Props {
     points: EmbeddingPoint[]
     modelNames: string[]
-    colorDots: boolean
+    usePluses: boolean
   }
 
-  let { points, modelNames, colorDots }: Props = $props()
+  let { points, modelNames, usePluses }: Props = $props()
 
   const fogColor = $derived($colors.fog)
   const textColor = $derived($colors.text)
@@ -46,10 +46,10 @@
   {#each points as point}
     <Billboard position={[point.x, point.y, point.z]}>
       <Text
-        text={colorDots ? String(modelNames.indexOf(point.model)) : "+"}
+        text={usePluses ? "+" : String(modelNames.indexOf(point.model))}
         fontSize={30}
         font="/Monaspace Neon Var.ttf"
-        color={colorDots ? modelColor(point.model) : textColor}
+        color={textColor}
       />
     </Billboard>
   {/each}

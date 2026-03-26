@@ -13,7 +13,7 @@
   const matrixData: number[][] = data.data
   let selectedModels = $state(new Set(modelNames))
   let selectedEvals = $state(new Set(evalNames))
-  let colorPoints = $state(false)
+  let usePluses = $state(false)
 
   let points = $state(
     computePoints(
@@ -50,8 +50,8 @@
   <InfoPanel />
 
   {#if __DEBUG__}
-    <DebugPanel {colorPoints} onchange={() => (colorPoints = !colorPoints)} />
+    <DebugPanel {usePluses} onchange={() => (usePluses = !usePluses)} />
   {/if}
 
-  <PointCloudScene {points} {modelNames} colorDots={colorPoints} />
+  <PointCloudScene {points} {modelNames} usePluses={usePluses} />
 </div>

@@ -1,15 +1,15 @@
 <script lang="ts">
   interface Props {
-    colorPoints: boolean
+    usePluses: boolean
     onchange: () => void
   }
 
-  let { colorPoints: colorDots, onchange }: Props = $props()
+  let { usePluses, onchange }: Props = $props()
 </script>
 
 <div class="panel fixed z-50 bottom-4 left-4">
   <label class="panel-checkbox-label">
-    <input type="checkbox" checked={colorDots} {onchange} />
-    <span class="panel-text">color dots by model</span>
+    <input type="checkbox" checked={usePluses} {onchange} />
+    <span class="panel-text">use pluses for points</span>
   </label>
 </div>
