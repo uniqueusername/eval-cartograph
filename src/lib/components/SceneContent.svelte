@@ -10,9 +10,10 @@
     modelNames: string[]
     usePluses: boolean
     onhover: (model: string | null, event: PointerEvent | null) => void
+    ontap: (model: string) => void
   }
 
-  let { points, modelNames, usePluses, onhover }: Props = $props()
+  let { points, modelNames, usePluses, onhover, ontap }: Props = $props()
 
   interactivity()
 
@@ -58,6 +59,7 @@
     <T.Mesh
       onpointerenter={(e: any) => { e.stopPropagation(); onhover(point.model, e.nativeEvent) }}
       onpointerleave={() => onhover(null, null)}
+      onclick={(e: any) => { e.stopPropagation(); ontap(point.model) }}
     >
       <T.SphereGeometry args={[18]} />
       <T.MeshBasicMaterial transparent opacity={0} depthWrite={false} />

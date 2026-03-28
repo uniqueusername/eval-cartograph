@@ -12,6 +12,7 @@
   let { points, modelNames, usePluses }: Props = $props()
 
   let hoveredModel: string | null = $state(null)
+  let tappedModel: string | null = $state(null)
   let displayModel: string | null = $state(null)
   let mouseX = $state(0)
   let mouseY = $state(0)
@@ -25,27 +26,53 @@
     }
   }
 
+  function ontap(model: string) {
+    if (tappedModel === model) {
+      tappedModel = null
+    } else {
+      tappedModel = model
+      displayModel = model
+    }
+  }
+
+  function ondismiss() {
+    tappedModel = null
+  }
+
   function onmousemove(e: MouseEvent) {
     mouseX = e.clientX
     mouseY = e.clientY
   }
 
-  let active = $derived(!!hoveredModel)
+  let active = $derived(!!hoveredModel || !!tappedModel)
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="w-full h-full" onmousemove={onmousemove}>
   <Canvas>
-    <SceneContent {points} {modelNames} {usePluses} {onhover} />
+    <SceneContent {points} {modelNames} {usePluses} {onhover} {ontap} />
   </Canvas>
 
+  <!-- desktop: follows cursor -->
   {#if displayModel}
     <div
-      class="panel fixed z-50 pointer-events-none"
+      class="panel fixed z-50 pointer-events-none hidden xl:block"
       class:active
       style="left: {mouseX + 12}px; top: {mouseY + 12}px;"
     >
       <span class="panel-text">{displayModel}</span>
+    </div>
+  {/if}
+
+  <!-- mobile: fixed top-center, tap to dismiss -->
+  {#if tappedModel}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="xl:hidden fixed inset-0 z-40" onclick={ondismiss}></div>
+    <div
+      class="panel fixed z-50 top-4 left-1/2 -translate-x-1/2 xl:hidden"
+      class:active
+    >
+      <span class="panel-text">{tappedModel}</span>
     </div>
   {/if}
 </div>
