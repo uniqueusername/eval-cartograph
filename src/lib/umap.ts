@@ -33,7 +33,7 @@ export function computeEmbedding(
   const umap = new UMAP({
     nComponents: 3,
     random: seededRandom(42),
-    nNeighbors: 8,
+    nNeighbors: 6,
   })
   const embedding = umap.fit(data)
   return embedding.map((row, i) => ({
