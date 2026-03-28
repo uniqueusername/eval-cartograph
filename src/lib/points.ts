@@ -40,28 +40,29 @@ export function computePoints(
 
   const rawPoints = computeEmbedding(filteredNames, filteredData)
 
-  const scaled = rawPoints.map((p) => ({
-    model: p.model,
-    x: CLOUD_SCALE * p.x,
-    y: CLOUD_SCALE * p.y,
-    z: CLOUD_SCALE * p.z,
-  }))
-
-  const sum = scaled.reduce(
+  // center on centroid
+  const sum = rawPoints.reduce(
     (a, b) => ({ x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }),
     { x: 0, y: 0, z: 0 },
   )
-
-  const centroid = {
-    x: sum.x / scaled.length,
-    y: sum.y / scaled.length,
-    z: sum.z / scaled.length,
-  }
-
-  return scaled.map((p) => ({
+  const n = rawPoints.length
+  const centered = rawPoints.map((p) => ({
     model: p.model,
-    x: p.x - centroid.x,
-    y: p.y - centroid.y,
-    z: p.z - centroid.z,
+    x: p.x - sum.x / n,
+    y: p.y - sum.y / n,
+    z: p.z - sum.z / n,
+  }))
+
+  // normalize so RMS distance from origin = 1, then apply CLOUD_SCALE
+  const rms = Math.sqrt(
+    centered.reduce((s, p) => s + p.x * p.x + p.y * p.y + p.z * p.z, 0) / n,
+  )
+  const scale = rms > 1e-10 ? CLOUD_SCALE / rms : 1
+
+  return centered.map((p) => ({
+    model: p.model,
+    x: p.x * scale,
+    y: p.y * scale,
+    z: p.z * scale,
   }))
 }
