@@ -2,7 +2,7 @@
   import { T, useThrelte } from "@threlte/core"
   import { Billboard, interactivity, OrbitControls, Text } from "@threlte/extras"
   import { useTask } from "@threlte/core"
-  import { Vector3 } from "three"
+  import { Vector3, PlaneGeometry } from "three"
   import { colors } from "$lib/colors"
   import { CAMERA_DISTANCE } from "$lib/points"
   import type { EmbeddingPoint } from "$lib/umap"
@@ -37,10 +37,17 @@
   })
 
   let downModel: string | null = null
+  let hoveredModel: string | null = $state(null)
+
+  const s = 22
+  const t = 1.5
+  const hGeom = new PlaneGeometry(s * 2, t)
+  const vGeom = new PlaneGeometry(t, s * 2)
 
   const fogColor = $derived($colors.fog)
   const textColor = $derived($colors.text)
   const axisColor = $derived($colors.axis)
+  const accentColor = $derived($colors.accent)
 </script>
 
 <T.OrthographicCamera
@@ -76,12 +83,24 @@
       color={textColor}
       anchorX="center"
       anchorY="middle"
-      strokeWidth={point.model === tappedModel ? 2 : 0}
-      strokeColor={textColor}
     />
+    {#if point.model === tappedModel || point.model === hoveredModel}
+      <T.Mesh geometry={hGeom} position={[0, s, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+      <T.Mesh geometry={hGeom} position={[0, -s, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+      <T.Mesh geometry={vGeom} position={[-s, 0, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+      <T.Mesh geometry={vGeom} position={[s, 0, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+    {/if}
     <T.Mesh
-      onpointerenter={(e: any) => { e.stopPropagation(); onhover(point.model, e.nativeEvent) }}
-      onpointerleave={() => onhover(null, null)}
+      onpointerenter={(e: any) => { e.stopPropagation(); hoveredModel = point.model; onhover(point.model, e.nativeEvent) }}
+      onpointerleave={() => { hoveredModel = null; onhover(null, null) }}
       onpointerdown={(e: any) => { e.stopPropagation(); downModel = point.model }}
       onpointerup={(e: any) => { e.stopPropagation(); if (downModel === point.model) ontap(point.model); downModel = null }}
     >
