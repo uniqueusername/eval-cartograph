@@ -12,32 +12,35 @@
     modelNames: string[]
     usePluses: boolean
     tappedModel: string | null
-    onhover: (model: string | null, event: PointerEvent | null) => void
     ontap: (model: string) => void
-    onproject: (x: number, y: number) => void
+    onproject: (model: string | null, x: number, y: number) => void
   }
 
-  let { points, modelNames, usePluses, tappedModel, onhover, ontap, onproject }: Props = $props()
+  let { points, modelNames, usePluses, tappedModel, ontap, onproject }: Props = $props()
 
   interactivity()
 
   const { camera, renderer } = useThrelte()
   const projVec = new Vector3()
 
+  let downModel: string | null = null
+  let hoveredModel: string | null = $state(null)
+
+  let activeModel = $derived(hoveredModel ?? tappedModel)
+  let activePoint = $derived(activeModel ? points.find((p) => p.model === activeModel) : null)
+
   useTask(() => {
-    if (!tappedModel) return
-    const point = points.find((p) => p.model === tappedModel)
-    if (!point) return
-    projVec.set(point.x, point.y, point.z)
+    if (!activePoint || !activeModel) {
+      onproject(null, 0, 0)
+      return
+    }
+    projVec.set(activePoint.x, activePoint.y, activePoint.z)
     projVec.project(camera.current)
     const canvas = renderer.domElement
     const x = (projVec.x * 0.5 + 0.5) * canvas.clientWidth
     const y = (-projVec.y * 0.5 + 0.5) * canvas.clientHeight
-    onproject(x, y)
+    onproject(activeModel, x, y)
   })
-
-  let downModel: string | null = null
-  let hoveredModel: string | null = $state(null)
 
   const s = 22
   const t = 1.5
@@ -84,7 +87,7 @@
       anchorX="center"
       anchorY="middle"
     />
-    {#if point.model === tappedModel || point.model === hoveredModel}
+    {#if point.model === activeModel}
       <T.Mesh geometry={hGeom} position={[0, s, 0]}>
         <T.MeshBasicMaterial color={accentColor} />
       </T.Mesh>
@@ -99,8 +102,8 @@
       </T.Mesh>
     {/if}
     <T.Mesh
-      onpointerenter={(e: any) => { e.stopPropagation(); hoveredModel = point.model; onhover(point.model, e.nativeEvent) }}
-      onpointerleave={() => { hoveredModel = null; onhover(null, null) }}
+      onpointerenter={(e: any) => { e.stopPropagation(); hoveredModel = point.model }}
+      onpointerleave={() => { hoveredModel = null }}
       onpointerdown={(e: any) => { e.stopPropagation(); downModel = point.model }}
       onpointerup={(e: any) => { e.stopPropagation(); if (downModel === point.model) ontap(point.model); downModel = null }}
     >
