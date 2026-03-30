@@ -16,6 +16,8 @@
   let displayModel: string | null = $state(null)
   let mouseX = $state(0)
   let mouseY = $state(0)
+  let tapX = $state(0)
+  let tapY = $state(0)
 
   function onhover(model: string | null, event: PointerEvent | null) {
     hoveredModel = model
@@ -26,18 +28,26 @@
     }
   }
 
+  let tapTime = 0
+
   function ontap(model: string) {
+    tapTime = Date.now()
     if (tappedModel === model) {
       tappedModel = null
     } else {
       tappedModel = model
-      displayModel = model
     }
   }
 
-  function ondismiss() {
-    tappedModel = null
+  function dismissTap() {
+    if (Date.now() - tapTime > 200) tappedModel = null
   }
+
+  function onproject(x: number, y: number) {
+    tapX = x
+    tapY = y
+  }
+
 
   function onmousemove(e: MouseEvent) {
     mouseX = e.clientX
@@ -50,27 +60,29 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="w-full h-full" onmousemove={onmousemove}>
   <Canvas>
-    <SceneContent {points} {modelNames} {usePluses} {onhover} {ontap} />
+    <SceneContent {points} {modelNames} {usePluses} {tappedModel} {onhover} {ontap} {onproject} />
   </Canvas>
 
-  <!-- desktop: follows cursor -->
-  {#if displayModel}
-    <div
-      class="panel fixed z-50 pointer-events-none hidden xl:block"
-      class:active
-      style="left: {mouseX + 12}px; top: {mouseY + 12}px;"
-    >
-      <span class="panel-text">{displayModel}</span>
-    </div>
+  <!-- hover: follows cursor (devices with hover support) -->
+  {#if hoveredModel}
+    {#key hoveredModel}
+      <div
+        class="panel hover-tooltip fixed z-50 pointer-events-none active"
+        style="left: {mouseX + 12}px; top: {mouseY + 12}px;"
+      >
+        <span class="panel-text">{hoveredModel}</span>
+      </div>
+    {/key}
   {/if}
 
-  <!-- mobile: fixed top-center, tap to dismiss -->
+  <!-- tap: pinned to point (touch devices) -->
   {#if tappedModel}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="xl:hidden fixed inset-0 z-40" onclick={ondismiss}></div>
     <div
-      class="panel fixed z-50 top-4 left-1/2 -translate-x-1/2 xl:hidden"
-      class:active
+      class="panel tap-tooltip fixed z-50 -translate-x-1/2"
+      class:active={!!tappedModel}
+      style="left: {tapX}px; top: {tapY - 40}px;"
+      onclick={dismissTap}
     >
       <span class="panel-text">{tappedModel}</span>
     </div>
@@ -79,15 +91,25 @@
 
 <style>
   .panel {
-    opacity: 0;
-    transition: opacity 100ms ease-out;
+    background: color-mix(in srgb, var(--color-bg) 50%, transparent);
+    transition: background 100ms ease-out;
   }
   .panel.active {
-    animation: pop-settle 150ms ease-out forwards;
+    animation: flash-settle 150ms ease-out forwards;
   }
 
-  @keyframes pop-settle {
-    0% { opacity: 1; }
-    100% { opacity: 0.7; }
+  @keyframes flash-settle {
+    0% { background: color-mix(in srgb, var(--color-bg) 50%, white 20%); }
+    100% { background: color-mix(in srgb, var(--color-bg) 50%, transparent); }
+  }
+
+  /* hover tooltip: only on devices with a pointer */
+  @media (hover: none) {
+    .hover-tooltip { display: none; }
+  }
+
+  /* tap tooltip + dismiss: only on touch devices */
+  @media (hover: hover) {
+    .tap-tooltip { display: none; }
   }
 </style>

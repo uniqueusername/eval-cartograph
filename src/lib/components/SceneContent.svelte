@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { T } from "@threlte/core"
+  import { T, useThrelte } from "@threlte/core"
   import { Billboard, interactivity, OrbitControls, Text } from "@threlte/extras"
+  import { useTask } from "@threlte/core"
+  import { Vector3 } from "three"
   import { colors } from "$lib/colors"
   import { CAMERA_DISTANCE } from "$lib/points"
   import type { EmbeddingPoint } from "$lib/umap"
@@ -9,13 +11,32 @@
     points: EmbeddingPoint[]
     modelNames: string[]
     usePluses: boolean
+    tappedModel: string | null
     onhover: (model: string | null, event: PointerEvent | null) => void
     ontap: (model: string) => void
+    onproject: (x: number, y: number) => void
   }
 
-  let { points, modelNames, usePluses, onhover, ontap }: Props = $props()
+  let { points, modelNames, usePluses, tappedModel, onhover, ontap, onproject }: Props = $props()
 
   interactivity()
+
+  const { camera, renderer } = useThrelte()
+  const projVec = new Vector3()
+
+  useTask(() => {
+    if (!tappedModel) return
+    const point = points.find((p) => p.model === tappedModel)
+    if (!point) return
+    projVec.set(point.x, point.y, point.z)
+    projVec.project(camera.current)
+    const canvas = renderer.domElement
+    const x = (projVec.x * 0.5 + 0.5) * canvas.clientWidth
+    const y = (-projVec.y * 0.5 + 0.5) * canvas.clientHeight
+    onproject(x, y)
+  })
+
+  let downModel: string | null = null
 
   const fogColor = $derived($colors.fog)
   const textColor = $derived($colors.text)
@@ -55,11 +76,14 @@
       color={textColor}
       anchorX="center"
       anchorY="middle"
+      strokeWidth={point.model === tappedModel ? 2 : 0}
+      strokeColor={textColor}
     />
     <T.Mesh
       onpointerenter={(e: any) => { e.stopPropagation(); onhover(point.model, e.nativeEvent) }}
       onpointerleave={() => onhover(null, null)}
-      onclick={(e: any) => { e.stopPropagation(); ontap(point.model) }}
+      onpointerdown={(e: any) => { e.stopPropagation(); downModel = point.model }}
+      onpointerup={(e: any) => { e.stopPropagation(); if (downModel === point.model) ontap(point.model); downModel = null }}
     >
       <T.SphereGeometry args={[18]} />
       <T.MeshBasicMaterial transparent opacity={0} depthWrite={false} />
