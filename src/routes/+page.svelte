@@ -1,16 +1,26 @@
 <script lang="ts">
   import { alignProcrustes } from "$lib/procrustes"
   import { computePoints } from "$lib/points"
+  import type { EvalResult } from "$lib/umap"
   import FilterPanel from "$lib/components/FilterPanel.svelte"
   import DebugPanel from "$lib/components/DebugPanel.svelte"
   import PointCloudScene from "$lib/components/PointCloudScene.svelte"
-    import InfoPanel from "$lib/components/InfoPanel.svelte"
+  import InfoPanel from "$lib/components/InfoPanel.svelte"
 
-  let { data } = $props()
+  let { data }: {
+    data: {
+      modelNames: string[]
+      evalNames: string[]
+      data: number[][]
+      evalResultsByModel: Record<string, EvalResult[]>
+    }
+  } = $props()
 
   const modelNames: string[] = data.modelNames
   const evalNames: string[] = data.evalNames
   const matrixData: number[][] = data.data
+  const evalResultsByModel: Record<string, EvalResult[]> = data.evalResultsByModel
+
   let selectedModels = $state(new Set(modelNames))
   let selectedEvals = $state(new Set(evalNames))
   let usePluses = $state(false)
@@ -53,5 +63,5 @@
     <DebugPanel {usePluses} onchange={() => (usePluses = !usePluses)} />
   {/if}
 
-  <PointCloudScene {points} {modelNames} usePluses={usePluses} />
+  <PointCloudScene {points} {modelNames} {evalResultsByModel} usePluses={usePluses} />
 </div>

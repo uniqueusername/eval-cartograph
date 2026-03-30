@@ -7,6 +7,12 @@ export interface EmbeddingPoint {
   z: number
 }
 
+export interface EvalResult {
+  evalName: string
+  displayName: string
+  score: number
+}
+
 export function parseMatrix(csv: string): {
   modelNames: string[]
   evalNames: string[]
@@ -17,6 +23,32 @@ export function parseMatrix(csv: string): {
   const modelNames = lines.slice(1).map((row) => row.split(",")[0])
   const data = lines.slice(1).map((row) => row.split(",").slice(1).map(Number))
   return { modelNames, evalNames, data }
+}
+
+export function parseEvalResults(csv: string): {
+  modelNames: string[]
+  evalResultsByModel: Record<string, EvalResult[]>
+} {
+  const lines = csv.trim().split("\n")
+  const evalNames = lines[0].split(",").slice(1)
+  const evalResultsByModel: Record<string, EvalResult[]> = {}
+
+  for (const row of lines.slice(1)) {
+    const [model, ...scores] = row.split(",")
+    evalResultsByModel[model] = evalNames.map((evalName, index) => ({
+      evalName,
+      displayName:
+        evalName.includes("/") ?
+          evalName.split("/").slice(1).join("/")
+        : evalName,
+      score: Number(scores[index]),
+    }))
+  }
+
+  return {
+    modelNames: lines.slice(1).map((row) => row.split(",")[0]),
+    evalResultsByModel,
+  }
 }
 
 function seededRandom(seed: number): () => number {

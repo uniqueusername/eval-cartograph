@@ -15,7 +15,6 @@
   --color-fog: #ffffff;
   --color-axis: #444444;
   --color-accent: #ff3388;
-  --color-accent-2: #444444;
 }
 
 .dark {
@@ -25,7 +24,6 @@
   --color-fog: #000000;
   --color-axis: #444444;
   --color-accent: #ff3388;
-  --color-accent-2: #444444;
 }
 
 @layer components {
@@ -57,14 +55,14 @@
     }
 
     & ::-webkit-scrollbar-thumb {
-      background: var(--color-accent-2);
+      background: var(--color-border);
       border-radius: 0;
     }
   }
 
   @supports not selector(::-webkit-scrollbar) {
     .panel-collapsible {
-      scrollbar-color: var(--color-accent-2) transparent;
+      scrollbar-color: var(--color-border) transparent;
       scrollbar-width: thin;
     }
   }
