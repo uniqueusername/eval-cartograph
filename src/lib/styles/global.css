@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+  font-family: "Monaspace Neon";
+  src: url("/Monaspace Neon Var.ttf") format("truetype");
+}
+
+@theme {
+  --font-neon: "Monaspace Neon", monospace;
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-border: #444444;
+  --color-fog: #ffffff;
+  --color-axis: #444444;
+  --color-accent: #ff3388;
+}
+
+:root {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.dark {
+  --color-bg: #000000;
+  --color-text: #ffffff;
+  --color-border: #444444;
+  --color-fog: #000000;
+  --color-axis: #444444;
+  --color-accent: #ff3388;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  font-family: system-ui, sans-serif;
+}

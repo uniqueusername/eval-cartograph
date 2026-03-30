@@ -1,25 +1,25 @@
 <script lang="ts">
+  import Panel from "$lib/components/ui/Panel.svelte"
+
   let mobileVisible = $state(true)
 </script>
 
-<!-- desktop -->
-<div class="panel hidden xl:block fixed z-50 bottom-4 right-4">
-  <div class="panel-title mb-4">eval cartograph</div>
-  <p class="panel-text">hello world</p>
-</div>
+<Panel className="fixed bottom-4 right-4 z-50 hidden xl:block">
+  <div class="mb-4 font-neon text-sm font-semibold tracking-wide lowercase">eval cartograph</div>
+  <p class="font-neon whitespace-nowrap lowercase">hello world</p>
+</Panel>
 
-<!-- mobile popup -->
 {#if mobileVisible}
   <div class="xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div class="panel relative w-full max-w-sm">
+    <Panel className="relative w-full max-w-sm">
       <button
-        class="absolute top-2 right-2 text-text font-neon text-xs leading-none p-1"
+        class="absolute top-2 right-2 p-1 font-neon text-xs leading-none text-text"
         onclick={() => (mobileVisible = false)}
       >
         &times;
       </button>
-      <div class="panel-title mb-4">eval cartograph</div>
-      <p class="panel-text">hello world</p>
-    </div>
+      <div class="mb-4 font-neon text-sm font-semibold tracking-wide lowercase">eval cartograph</div>
+      <p class="font-neon whitespace-nowrap lowercase">hello world</p>
+    </Panel>
   </div>
 {/if}

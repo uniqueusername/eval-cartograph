@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Panel from "$lib/components/ui/Panel.svelte"
+  import CheckboxRow from "$lib/components/ui/CheckboxRow.svelte"
+
   interface Props {
     usePluses: boolean
     onchange: () => void
@@ -7,9 +10,8 @@
   let { usePluses, onchange }: Props = $props()
 </script>
 
-<div class="panel fixed z-50 bottom-4 left-4">
-  <label class="panel-checkbox-label">
-    <input type="checkbox" checked={usePluses} {onchange} />
-    <span class="panel-text">use pluses for points</span>
-  </label>
-</div>
+<Panel className="fixed bottom-4 left-4 z-50">
+  <CheckboxRow checked={usePluses} {onchange}>
+    use pluses for points
+  </CheckboxRow>
+</Panel>

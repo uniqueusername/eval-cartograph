@@ -3,6 +3,7 @@
   import { Canvas } from "@threlte/core"
   import SceneContent from "./SceneContent.svelte"
   import type { EmbeddingPoint } from "$lib/umap"
+  import ModelTooltip from "./ModelTooltip.svelte"
 
   interface Props {
     points: EmbeddingPoint[]
@@ -58,11 +59,6 @@
   let barAnimationFrame: number | null = null
 
   const MAX_VISIBLE_EVALS = 4
-  const SCORE_INSIDE_THRESHOLD = 0.78
-
-  function formatScore(score: number): string {
-    return score.toFixed(2)
-  }
 
   function getVisibleEvalResults(evalResults: EvalResult[]): EvalResult[] {
     const sorted = [...evalResults].sort((a, b) => b.score - a.score)
@@ -124,163 +120,17 @@
   </Canvas>
 
   {#if activeModel}
-    {#key activeModel}
-      <div
-        class="panel fixed z-50 pointer-events-none"
-        style="left: {tooltipX}px; top: {tooltipY}px; translate: {translateX} {translateY}; transform: {tooltipScale}; transform-origin: {tooltipX < window.innerWidth / 2 ? 'left' : 'right'} {tooltipY < window.innerHeight / 2 ? 'top' : 'bottom'}; opacity: {tooltipOpacity};"
-      >
-        <div class="tooltip-shell">
-          <span class="panel-text tooltip-title">{activeModel}</span>
-
-          {#if visibleEvalResults.length > 0}
-            <div class="tooltip-chart">
-              {#each visibleEvalResults as result, index}
-                {#if isEvalResultsTruncated && index === 2}
-                  <div class="tooltip-gap panel-text">...</div>
-                {/if}
-
-                <div class="tooltip-row">
-                  <span class="panel-text tooltip-label">{result.displayName}</span>
-
-                  <div class="tooltip-track">
-                    <div
-                      class="tooltip-bar"
-                      style="width: {animateBars ? Math.max(0, Math.min(1, result.score)) * 100 : 0}%;"
-                    >
-                      {#if result.score >= SCORE_INSIDE_THRESHOLD}
-                        <span class="panel-text tooltip-score-inline tooltip-score-inside">
-                          {formatScore(result.score)}
-                        </span>
-                      {/if}
-                    </div>
-
-                    {#if result.score < SCORE_INSIDE_THRESHOLD}
-                      <span
-                        class="panel-text tooltip-score tooltip-score-outside"
-                        style="left: min(calc({Math.max(0, Math.min(1, result.score)) * 100}% + 0.35rem), calc(100% - 2.55rem));"
-                      >
-                        {formatScore(result.score)}
-                      </span>
-                    {/if}
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {/if}
-        </div>
-      </div>
-    {/key}
+    <ModelTooltip
+      {activeModel}
+      {animateBars}
+      {isEvalResultsTruncated}
+      tooltipFog={tooltipOpacity}
+      {tooltipScale}
+      {tooltipX}
+      {tooltipY}
+      {translateX}
+      {translateY}
+      {visibleEvalResults}
+    />
   {/if}
 </div>
-
-<style>
-  .panel {
-    background: var(--color-bg);
-  }
-
-  .tooltip-shell {
-    min-width: 23rem;
-  }
-
-  .tooltip-title {
-    display: block;
-    margin-bottom: 0.6rem;
-    max-width: 28rem;
-    overflow-wrap: anywhere;
-    white-space: normal;
-  }
-
-  .tooltip-chart {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .tooltip-gap {
-    display: grid;
-    grid-template-columns: 6.4rem minmax(0, 1fr);
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 0.62rem;
-    opacity: 0.7;
-  }
-
-  .tooltip-gap::before {
-    content: "";
-  }
-
-  .tooltip-gap {
-    text-align: center;
-  }
-
-  .tooltip-row {
-    display: grid;
-    grid-template-columns: 6.4rem minmax(0, 1fr);
-    align-items: center;
-    gap: 0.6rem;
-  }
-
-  .tooltip-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .tooltip-track {
-    position: relative;
-    height: 1rem;
-    background: color-mix(in srgb, var(--color-text) 15%, transparent);
-    overflow: hidden;
-  }
-
-  .tooltip-bar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    max-width: 100%;
-    height: 100%;
-    padding-right: 0.25rem;
-    background: var(--color-accent);
-    transition: width 300ms cubic-bezier(0.12, 0.9, 0.18, 1);
-  }
-
-  .tooltip-score {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.62rem;
-    line-height: 1;
-    pointer-events: none;
-  }
-
-  .tooltip-score-inline {
-    font-size: 0.62rem;
-    line-height: 1;
-    pointer-events: none;
-  }
-
-  .tooltip-score-inside {
-    display: block;
-    color: var(--color-bg);
-  }
-
-  .tooltip-score-outside {
-    color: var(--color-text);
-  }
-
-  @media (max-width: 767px) {
-    .tooltip-shell {
-      min-width: 18.5rem;
-    }
-
-    .tooltip-row {
-      grid-template-columns: 5.2rem minmax(0, 1fr);
-      gap: 0.45rem;
-    }
-
-    .tooltip-gap {
-      grid-template-columns: 5.2rem minmax(0, 1fr);
-      gap: 0.45rem;
-    }
-  }
-</style>

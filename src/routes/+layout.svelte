@@ -1,10 +1,9 @@
 <script lang="ts">
   import favicon from "$lib/assets/favicon.svg"
   import ThemeToggle from "$lib/components/ThemeToggle.svelte"
+  import "$lib/styles/global.css"
 
   let { children } = $props()
-
-  import "../app.css"
 </script>
 
 <svelte:head>

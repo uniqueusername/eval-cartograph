@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from "svelte"
   import { alignProcrustes } from "$lib/procrustes"
   import { computePoints } from "$lib/points"
   import type { EvalResult } from "$lib/umap"
@@ -16,20 +17,15 @@
     }
   } = $props()
 
-  const modelNames: string[] = data.modelNames
-  const evalNames: string[] = data.evalNames
-  const matrixData: number[][] = data.data
-  const evalResultsByModel: Record<string, EvalResult[]> = data.evalResultsByModel
-
-  let selectedModels = $state(new Set(modelNames))
-  let selectedEvals = $state(new Set(evalNames))
+  let selectedModels = $state(new Set(untrack(() => data.modelNames)))
+  let selectedEvals = $state(new Set(untrack(() => data.evalNames)))
   let usePluses = $state(false)
 
   let points = $state(
     computePoints(
-      modelNames,
-      evalNames,
-      matrixData,
+      untrack(() => data.modelNames),
+      untrack(() => data.evalNames),
+      untrack(() => data.data),
       selectedModels,
       selectedEvals,
     ),
@@ -38,9 +34,9 @@
   function onFilterChange() {
     const oldPoints = points
     const newPoints = computePoints(
-      modelNames,
-      evalNames,
-      matrixData,
+      data.modelNames,
+      data.evalNames,
+      data.data,
       selectedModels,
       selectedEvals,
     )
@@ -50,8 +46,8 @@
 
 <div class="w-full h-screen bg-bg">
   <FilterPanel
-    {modelNames}
-    {evalNames}
+    modelNames={data.modelNames}
+    evalNames={data.evalNames}
     {selectedModels}
     {selectedEvals}
     onchange={onFilterChange}
@@ -63,5 +59,10 @@
     <DebugPanel {usePluses} onchange={() => (usePluses = !usePluses)} />
   {/if}
 
-  <PointCloudScene {points} {modelNames} {evalResultsByModel} usePluses={usePluses} />
+  <PointCloudScene
+    {points}
+    modelNames={data.modelNames}
+    evalResultsByModel={data.evalResultsByModel}
+    usePluses={usePluses}
+  />
 </div>
