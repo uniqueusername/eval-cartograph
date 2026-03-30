@@ -17,6 +17,7 @@
   let activeModel: string | null = $state(null)
   let tooltipX = $state(0)
   let tooltipY = $state(0)
+  let tooltipFog = $state(1)
 
   function ontap(model: string) {
     tapTime = Date.now()
@@ -27,15 +28,29 @@
     }
   }
 
-  function onproject(model: string | null, x: number, y: number) {
+  function onproject(model: string | null, x: number, y: number, fogFactor: number = 1) {
     activeModel = model
     tooltipX = x
     tooltipY = y
+    tooltipFog = fogFactor
   }
 
   const GAP = 12
-  let translateX = $derived(tooltipX < window.innerWidth / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`)
-  let translateY = $derived(tooltipY < window.innerHeight / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`)
+  let isMobile = $derived(window.innerWidth < 768)
+  // desktop: push tooltip away from center (towards outer corner)
+  // mobile: push tooltip towards center (inverted) and scale down 50%
+  let translateX = $derived(
+    isMobile
+      ? tooltipX < window.innerWidth / 2 ? `${GAP}px` : `calc(-100% - ${GAP}px)`
+      : tooltipX < window.innerWidth / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`
+  )
+  let translateY = $derived(
+    isMobile
+      ? tooltipY < window.innerHeight / 2 ? `${GAP}px` : `calc(-100% - ${GAP}px)`
+      : tooltipY < window.innerHeight / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`
+  )
+  let tooltipScale = $derived(isMobile ? 'scale(0.8)' : '')
+  let tooltipOpacity = $derived(tooltipFog)
 
   let downX = 0
   let downY = 0
@@ -66,7 +81,7 @@
     {#key activeModel}
       <div
         class="panel fixed z-50 pointer-events-none active"
-        style="left: {tooltipX}px; top: {tooltipY}px; translate: {translateX} {translateY};"
+        style="left: {tooltipX}px; top: {tooltipY}px; translate: {translateX} {translateY}; transform: {tooltipScale}; transform-origin: {tooltipX < window.innerWidth / 2 ? 'left' : 'right'} {tooltipY < window.innerHeight / 2 ? 'top' : 'bottom'}; opacity: {tooltipOpacity};"
       >
         <span class="panel-text">{activeModel}</span>
       </div>

@@ -13,7 +13,7 @@
     usePluses: boolean
     tappedModel: string | null
     ontap: (model: string) => void
-    onproject: (model: string | null, x: number, y: number) => void
+    onproject: (model: string | null, x: number, y: number, fogFactor?: number) => void
   }
 
   let { points, modelNames, usePluses, tappedModel, ontap, onproject }: Props = $props()
@@ -29,17 +29,25 @@
   let activeModel = $derived(hoveredModel ?? tappedModel)
   let activePoint = $derived(activeModel ? points.find((p) => p.model === activeModel) : null)
 
+  const FOG_NEAR = 0
+  const FOG_FAR = 2500
+
   useTask(() => {
     if (!activePoint || !activeModel) {
       onproject(null, 0, 0)
       return
     }
     projVec.set(activePoint.x, activePoint.y, activePoint.z)
+    // compute view-space z depth to match Three.js linear fog calculation
+    projVec.applyMatrix4(camera.current.matrixWorldInverse)
+    const dist = -projVec.z
+    const fogFactor = Math.max(0, Math.min(1, (FOG_FAR - dist) / (FOG_FAR - FOG_NEAR)))
+    projVec.set(activePoint.x, activePoint.y, activePoint.z)
     projVec.project(camera.current)
     const canvas = renderer.domElement
     const x = (projVec.x * 0.5 + 0.5) * canvas.clientWidth
     const y = (-projVec.y * 0.5 + 0.5) * canvas.clientHeight
-    onproject(activeModel, x, y)
+    onproject(activeModel, x, y, fogFactor)
   })
 
   const s = 22
