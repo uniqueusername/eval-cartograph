@@ -53,7 +53,7 @@
   </div>
 
   <div class={`collapsible ${collapsibleClassName}`.trim()}>
-    <div class={`grid overflow-hidden ${bodyClassName}`.trim()}>
+    <div class={`grid content-start ${bodyClassName}`.trim()}>
       {#each items as item, index}
         <CheckboxRow checked={selected.has(item)} onchange={() => toggle(item)} href={hrefFor?.(item)}>
           {labelFor(item, index)}

@@ -85,7 +85,8 @@
           toggle={toggleModel}
           labelFor={modelLabel}
           panelClassName="flex min-h-0 flex-1 flex-col overflow-hidden"
-          bodyClassName="flex-1 overflow-y-auto overflow-x-hidden"
+          collapsibleClassName="flex flex-1 flex-col min-h-0"
+          bodyClassName="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
         />
         <SelectionPanel
           title="evals"
@@ -94,7 +95,8 @@
           toggle={toggleEval}
           hrefFor={evalHref}
           panelClassName="flex min-h-0 flex-1 flex-col overflow-hidden"
-          bodyClassName="flex-1 overflow-y-auto overflow-x-hidden"
+          collapsibleClassName="flex flex-1 flex-col min-h-0"
+          bodyClassName="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
         />
       </div>
     </div>
