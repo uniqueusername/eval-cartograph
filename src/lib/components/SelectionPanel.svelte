@@ -10,6 +10,7 @@
     bodyClassName?: string
     collapsibleClassName?: string
     headingClassName?: string
+    hrefFor?: (name: string) => string
     labelFor?: (name: string, index: number) => string
     panelClassName?: string
     showCaret?: boolean
@@ -23,6 +24,7 @@
     bodyClassName = "",
     collapsibleClassName = "",
     headingClassName = "",
+    hrefFor,
     labelFor = (name: string) => name,
     panelClassName = "",
     showCaret = false,
@@ -53,7 +55,7 @@
   <div class={`collapsible ${collapsibleClassName}`.trim()}>
     <div class={`grid overflow-hidden ${bodyClassName}`.trim()}>
       {#each items as item, index}
-        <CheckboxRow checked={selected.has(item)} onchange={() => toggle(item)}>
+        <CheckboxRow checked={selected.has(item)} onchange={() => toggle(item)} href={hrefFor?.(item)}>
           {labelFor(item, index)}
         </CheckboxRow>
       {/each}

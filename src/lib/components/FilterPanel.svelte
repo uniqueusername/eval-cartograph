@@ -34,6 +34,10 @@
   function modelLabel(name: string, index: number): string {
     return `${name} [${index}]`
   }
+
+  function evalHref(name: string): string {
+    return `https://app.primeintellect.ai/dashboard/environments/${name}`
+  }
 </script>
 
 <div class="group hidden xl:flex fixed top-4 left-4 z-50 gap-2">
@@ -54,6 +58,7 @@
     items={evalNames}
     selected={selectedEvals}
     toggle={toggleEval}
+    hrefFor={evalHref}
     showCaret={true}
     panelClassName="min-w-35 w-max"
     collapsibleClassName="grid grid-rows-[0fr] transition-[grid-template-rows] duration-150 ease-out group-hover:grid-rows-[1fr]"
@@ -87,6 +92,7 @@
           items={evalNames}
           selected={selectedEvals}
           toggle={toggleEval}
+          hrefFor={evalHref}
           panelClassName="flex min-h-0 flex-1 flex-col overflow-hidden"
           bodyClassName="flex-1 overflow-y-auto overflow-x-hidden"
         />

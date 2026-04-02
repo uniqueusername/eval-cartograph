@@ -8,7 +8,7 @@
 {#if desktopVisible}
   <Panel className="fixed bottom-4 right-4 z-50 hidden xl:block">
     <button
-      class="absolute top-2 right-2 p-1 font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
+      class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
       onclick={() => (desktopVisible = false)}
     >
       &times;
@@ -22,7 +22,7 @@
   <div class="xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
     <Panel className="relative w-full max-w-sm">
       <button
-        class="absolute top-2 right-2 p-1 font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
+        class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
         onclick={() => (mobileVisible = false)}
       >
         &times;
