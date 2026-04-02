@@ -66,6 +66,15 @@
   />
 </div>
 
+{#if mobileExpanded}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="xl:hidden fixed inset-0 z-40"
+    onclick={() => (mobileExpanded = false)}
+    onkeydown={(e) => e.key === 'Escape' && (mobileExpanded = false)}
+  ></div>
+{/if}
+
 <div class="xl:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col">
   <div
     class="grid transition-[grid-template-rows] duration-200 ease-out"
