@@ -40,7 +40,7 @@
 </script>
 
 <Panel
-  className="pointer-events-none fixed z-50"
+  className="pointer-events-none fixed z-30"
   style={`left: ${tooltipX}px; top: ${tooltipY}px; translate: ${translateX} ${translateY}; transform: ${tooltipScale}; transform-origin: ${tooltipX < window.innerWidth / 2 ? "left" : "right"} ${tooltipY < window.innerHeight / 2 ? "top" : "bottom"}; opacity: ${tooltipFog};`}
 >
   <div class="tooltip-shell">
