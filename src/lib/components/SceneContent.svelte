@@ -11,6 +11,7 @@
     points: EmbeddingPoint[]
     modelNames: string[]
     usePluses: boolean
+    isMobile: boolean
     selectedComparisonModels: string[]
     ontogglecomparison: (model: string) => void
     onproject: (model: string | null, x: number, y: number, fogFactor?: number) => void
@@ -20,6 +21,7 @@
     points,
     modelNames,
     usePluses,
+    isMobile,
     selectedComparisonModels,
     ontogglecomparison,
     onproject,
@@ -30,10 +32,10 @@
   const { camera, renderer } = useThrelte()
   const projVec = new Vector3()
 
-  let downModel: string | null = null
   let hoveredModel: string | null = $state(null)
+  let tappedModel: string | null = $state(null)
 
-  let activeModel = $derived(hoveredModel)
+  let activeModel = $derived(isMobile ? tappedModel : hoveredModel)
   let activePoint = $derived(activeModel ? points.find((p) => p.model === activeModel) : null)
   let selectedModelSet = $derived(new Set(selectedComparisonModels))
 
@@ -136,10 +138,27 @@
       </T.Mesh>
     {/if}
     <T.Mesh
-      onpointerenter={(e: any) => { e.stopPropagation(); hoveredModel = point.model }}
-      onpointerleave={() => { hoveredModel = null }}
-      onpointerdown={(e: any) => { e.stopPropagation(); downModel = point.model }}
-      onpointerup={(e: any) => { e.stopPropagation(); if (downModel === point.model) ontogglecomparison(point.model); downModel = null }}
+      onpointerenter={(e: any) => {
+        e.stopPropagation()
+        if (isMobile) return
+        hoveredModel = point.model
+      }}
+      onpointerleave={() => {
+        if (isMobile) return
+        hoveredModel = null
+      }}
+      onclick={(e: any) => {
+        e.stopPropagation()
+        if (isMobile) {
+          tappedModel = tappedModel === point.model ? null : point.model
+        } else {
+          ontogglecomparison(point.model)
+        }
+      }}
+      onpointermissed={() => {
+        if (!isMobile || tappedModel === null) return
+        tappedModel = null
+      }}
     >
       <T.SphereGeometry args={[18]} />
       <T.MeshBasicMaterial transparent opacity={0} depthWrite={false} />

@@ -53,9 +53,7 @@
       : tooltipX < window.innerWidth / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`
   )
   let translateY = $derived(
-    isMobile
-      ? tooltipY < window.innerHeight / 2 ? `${GAP}px` : `calc(-100% - ${GAP}px)`
-      : tooltipY < window.innerHeight / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`
+    tooltipY < window.innerHeight / 2 ? `calc(-100% - ${GAP}px)` : `${GAP}px`
   )
   let tooltipScale = $derived(isMobile ? 'scale(0.8)' : '')
   let tooltipOpacity = $derived(tooltipFog)
@@ -136,6 +134,7 @@
       {points}
       {modelNames}
       {usePluses}
+      {isMobile}
       {selectedComparisonModels}
       {ontogglecomparison}
       {onproject}
