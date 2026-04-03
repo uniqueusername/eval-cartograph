@@ -11,12 +11,19 @@
     points: EmbeddingPoint[]
     modelNames: string[]
     usePluses: boolean
-    tappedModel: string | null
-    ontap: (model: string) => void
+    selectedComparisonModels: string[]
+    ontogglecomparison: (model: string) => void
     onproject: (model: string | null, x: number, y: number, fogFactor?: number) => void
   }
 
-  let { points, modelNames, usePluses, tappedModel, ontap, onproject }: Props = $props()
+  let {
+    points,
+    modelNames,
+    usePluses,
+    selectedComparisonModels,
+    ontogglecomparison,
+    onproject,
+  }: Props = $props()
 
   interactivity()
 
@@ -26,8 +33,9 @@
   let downModel: string | null = null
   let hoveredModel: string | null = $state(null)
 
-  let activeModel = $derived(hoveredModel ?? tappedModel)
+  let activeModel = $derived(hoveredModel)
   let activePoint = $derived(activeModel ? points.find((p) => p.model === activeModel) : null)
+  let selectedModelSet = $derived(new Set(selectedComparisonModels))
 
   const FOG_NEAR = 0
   const FOG_FAR = 2500
@@ -54,6 +62,10 @@
   const t = 1.5
   const hGeom = new PlaneGeometry(s * 2, t)
   const vGeom = new PlaneGeometry(t, s * 2)
+  const selectedS = s - 0.5
+  const selectedT = 3.5
+  const selectedHGeom = new PlaneGeometry(selectedS * 2, selectedT)
+  const selectedVGeom = new PlaneGeometry(selectedT, selectedS * 2)
 
   const fogColor = $derived($colors.fog)
   const textColor = $derived($colors.text)
@@ -95,6 +107,20 @@
       anchorX="center"
       anchorY="middle"
     />
+    {#if selectedModelSet.has(point.model)}
+      <T.Mesh geometry={selectedHGeom} position={[0, selectedS, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+      <T.Mesh geometry={selectedHGeom} position={[0, -selectedS, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+      <T.Mesh geometry={selectedVGeom} position={[-selectedS, 0, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+      <T.Mesh geometry={selectedVGeom} position={[selectedS, 0, 0]}>
+        <T.MeshBasicMaterial color={accentColor} />
+      </T.Mesh>
+    {/if}
     {#if point.model === activeModel}
       <T.Mesh geometry={hGeom} position={[0, s, 0]}>
         <T.MeshBasicMaterial color={accentColor} />
@@ -113,7 +139,7 @@
       onpointerenter={(e: any) => { e.stopPropagation(); hoveredModel = point.model }}
       onpointerleave={() => { hoveredModel = null }}
       onpointerdown={(e: any) => { e.stopPropagation(); downModel = point.model }}
-      onpointerup={(e: any) => { e.stopPropagation(); if (downModel === point.model) ontap(point.model); downModel = null }}
+      onpointerup={(e: any) => { e.stopPropagation(); if (downModel === point.model) ontogglecomparison(point.model); downModel = null }}
     >
       <T.SphereGeometry args={[18]} />
       <T.MeshBasicMaterial transparent opacity={0} depthWrite={false} />

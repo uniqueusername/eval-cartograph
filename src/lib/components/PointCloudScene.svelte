@@ -4,6 +4,7 @@
   import SceneContent from "./SceneContent.svelte"
   import type { EmbeddingPoint } from "$lib/umap"
   import ModelTooltip from "./ModelTooltip.svelte"
+  import ComparisonPanel from "./ComparisonPanel.svelte"
 
   interface Props {
     points: EmbeddingPoint[]
@@ -14,21 +15,25 @@
 
   let { points, modelNames, evalResultsByModel, usePluses }: Props = $props()
 
-  let tappedModel: string | null = $state(null)
-  let tapTime = 0
+  let selectedComparisonModels = $state<string[]>([])
 
   let activeModel: string | null = $state(null)
   let tooltipX = $state(0)
   let tooltipY = $state(0)
   let tooltipFog = $state(1)
 
-  function ontap(model: string) {
-    tapTime = Date.now()
-    if (tappedModel === model) {
-      tappedModel = null
-    } else {
-      tappedModel = model
+  function ontogglecomparison(model: string) {
+    if (selectedComparisonModels.includes(model)) {
+      selectedComparisonModels = selectedComparisonModels.filter((name) => name !== model)
+      return
     }
+
+    selectedComparisonModels = [...selectedComparisonModels, model]
+  }
+
+  function clearcomparison() {
+    if (selectedComparisonModels.length === 0) return
+    selectedComparisonModels = []
   }
 
   function onproject(model: string | null, x: number, y: number, fogFactor: number = 1) {
@@ -69,24 +74,6 @@
   let visibleEvalResults = $derived(getVisibleEvalResults(activeEvalResults))
   let isEvalResultsTruncated = $derived(activeEvalResults.length > MAX_VISIBLE_EVALS)
 
-  let downX = 0
-  let downY = 0
-  const TAP_THRESHOLD = 10
-
-  function onpointerdown(e: PointerEvent) {
-    downX = e.clientX
-    downY = e.clientY
-  }
-
-  function onpointerup(e: PointerEvent) {
-    if (!tappedModel) return
-    const dx = e.clientX - downX
-    const dy = e.clientY - downY
-    if (dx * dx + dy * dy < TAP_THRESHOLD * TAP_THRESHOLD && Date.now() - tapTime > 200) {
-      tappedModel = null
-    }
-  }
-
   $effect(() => {
     if (barAnimationFrame !== null) {
       cancelAnimationFrame(barAnimationFrame)
@@ -111,12 +98,48 @@
       }
     }
   })
+
+  $effect(() => {
+    const visibleModels = new Set(points.map((point) => point.model))
+    const nextSelectedModels = selectedComparisonModels.filter((model) => visibleModels.has(model))
+    if (nextSelectedModels.length !== selectedComparisonModels.length) {
+      selectedComparisonModels = nextSelectedModels
+    }
+  })
+
+  function onkeydown(event: KeyboardEvent) {
+    if (event.code !== "Space") return
+    const target = event.target
+    if (target instanceof HTMLElement) {
+      const tagName = target.tagName
+      if (
+        target.isContentEditable ||
+        tagName === "INPUT" ||
+        tagName === "TEXTAREA" ||
+        tagName === "SELECT" ||
+        tagName === "BUTTON"
+      ) {
+        return
+      }
+    }
+
+    event.preventDefault()
+    clearcomparison()
+  }
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="w-full h-full" onpointerdown={onpointerdown} onpointerup={onpointerup}>
+<svelte:window onkeydown={onkeydown} />
+
+<div class="w-full h-full">
   <Canvas>
-    <SceneContent {points} {modelNames} {usePluses} {tappedModel} {ontap} {onproject} />
+    <SceneContent
+      {points}
+      {modelNames}
+      {usePluses}
+      {selectedComparisonModels}
+      {ontogglecomparison}
+      {onproject}
+    />
   </Canvas>
 
   {#if activeModel}
@@ -133,4 +156,6 @@
       {visibleEvalResults}
     />
   {/if}
+
+  <ComparisonPanel selectedModels={selectedComparisonModels} {evalResultsByModel} />
 </div>
