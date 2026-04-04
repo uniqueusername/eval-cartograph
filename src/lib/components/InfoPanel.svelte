@@ -1,8 +1,32 @@
 <script lang="ts">
   import Panel from "$lib/components/ui/Panel.svelte"
 
-  let desktopVisible = $state(true)
-  let mobileVisible = $state(true)
+  type PanelState = "open" | "closing" | "closed" | "opening"
+
+  let desktopState = $state<PanelState>("open")
+  let mobileState = $state<PanelState>("open")
+
+  const DURATION = 220
+
+  function close(which: "desktop" | "mobile") {
+    if (which === "desktop") {
+      desktopState = "closing"
+      setTimeout(() => (desktopState = "closed"), DURATION)
+    } else {
+      mobileState = "closing"
+      setTimeout(() => (mobileState = "closed"), DURATION)
+    }
+  }
+
+  function open(which: "desktop" | "mobile") {
+    if (which === "desktop") {
+      desktopState = "opening"
+      setTimeout(() => (desktopState = "open"), DURATION)
+    } else {
+      mobileState = "opening"
+      setTimeout(() => (mobileState = "open"), DURATION)
+    }
+  }
 </script>
 
 {#snippet socials()}
@@ -18,26 +42,37 @@
   </div>
 {/snippet}
 
-{#if desktopVisible}
-  <Panel className="fixed bottom-4 right-4 z-50 hidden xl:block">
-    <button
-      class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
-      onclick={() => (desktopVisible = false)}
-    >
-      &times;
-    </button>
-    <div class="mb-4 font-neon text-sm font-semibold tracking-wide lowercase">eval cartograph</div>
-      <p class="font-neon lowercase max-w-xs text-wrap">visualize the performance of different models against a set of environments from the prime intellect <a class="text-[var(--color-accent)] underline" href="https://app.primeintellect.ai/dashboard/environments">environments hub</a>. models with similar capability profiles will cluster.</p>
-    {@render socials()}
-  </Panel>
+<!-- Desktop -->
+{#if desktopState !== "closed"}
+  <div class={`info-shell hidden xl:block ${desktopState === "closing" ? "info-exit" : ""} ${desktopState === "opening" ? "info-enter" : ""}`}>
+    <Panel className="relative">
+      <button
+        class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
+        onclick={() => close("desktop")}
+      >
+        &times;
+      </button>
+      <div class="mb-4 font-neon text-sm font-semibold tracking-wide lowercase">eval cartograph</div>
+        <p class="font-neon lowercase max-w-xs text-wrap">visualize the performance of different models against a set of environments from the prime intellect <a class="text-[var(--color-accent)] underline" href="https://app.primeintellect.ai/dashboard/environments">environments hub</a>. models with similar capability profiles will cluster.</p>
+      {@render socials()}
+    </Panel>
+  </div>
+{:else}
+  <button
+    class="info-button hidden xl:flex"
+    onclick={() => open("desktop")}
+  >
+    i
+  </button>
 {/if}
 
-{#if mobileVisible}
-  <div class="xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+<!-- Mobile -->
+{#if mobileState !== "closed"}
+  <div class={`xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4 ${mobileState === "closing" ? "info-overlay-exit" : ""} ${mobileState === "opening" ? "info-overlay-enter" : ""}`}>
     <Panel className="relative w-full max-w-sm">
       <button
         class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
-        onclick={() => (mobileVisible = false)}
+        onclick={() => close("mobile")}
       >
         &times;
       </button>
@@ -46,4 +81,112 @@
       {@render socials()}
     </Panel>
   </div>
+{:else}
+  <button
+    class="xl:hidden info-button"
+    onclick={() => open("mobile")}
+  >
+    i
+  </button>
 {/if}
+
+<style>
+  .info-shell {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 50;
+    transform-origin: bottom right;
+  }
+
+  .info-exit {
+    animation: info-collapse 220ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+    pointer-events: none;
+  }
+
+  .info-enter {
+    animation: info-expand 220ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+  }
+
+  @keyframes info-collapse {
+    from {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+    }
+    to {
+      clip-path: inset(100% 0 0 100%);
+      opacity: 1;
+    }
+  }
+
+  @keyframes info-expand {
+    from {
+      clip-path: inset(100% 0 0 100%);
+      opacity: 1;
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+    }
+  }
+
+  /* Mobile overlay fade */
+  .info-overlay-exit {
+    animation: info-fade-out 220ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+    pointer-events: none;
+  }
+
+  .info-overlay-enter {
+    animation: info-fade-in 220ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+  }
+
+  @keyframes info-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes info-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .info-button {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 50;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-neon);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: default;
+    animation: info-button-in 220ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+  }
+
+  .info-button:hover {
+    background: color-mix(in srgb, var(--color-text) 10%, var(--color-bg));
+  }
+
+  .info-button:active {
+    background: color-mix(in srgb, var(--color-text) 20%, var(--color-bg));
+    transform: scale(0.9);
+    transition: transform 150ms ease-out;
+  }
+
+  @keyframes info-button-in {
+    from {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
