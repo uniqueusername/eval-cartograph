@@ -8,9 +8,10 @@
     selectedModels: string[]
     evalResultsByModel: Record<string, EvalResult[]>
     onclear: () => void
+    hasUsedTouch: boolean
   }
 
-  let { selectedModels, evalResultsByModel, onclear }: Props = $props()
+  let { selectedModels, evalResultsByModel, onclear, hasUsedTouch }: Props = $props()
 
   let evalColumns = $derived.by<{ evalName: string; displayName: string }[]>(() => {
     const firstModel = selectedModels[0]
@@ -39,7 +40,11 @@
 
 <div class="mobile-comparison">
   <div class="mobile-comparison-header">
-    <button class="clear-btn font-neon lowercase" onclick={() => { haptics.trigger([{ duration: 50, intensity: 1.0 }, { delay: 50, duration: 40, intensity: 0.7 }, { delay: 50, duration: 30, intensity: 0.5 }, { delay: 50, duration: 25, intensity: 0.3 }, { delay: 50, duration: 20, intensity: 0.15 }]); onclear() }}>clear</button>
+    {#if hasUsedTouch}
+      <button class="clear-btn font-neon lowercase hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out" onclick={() => { haptics.trigger([{ duration: 50, intensity: 1.0 }, { delay: 50, duration: 40, intensity: 0.7 }, { delay: 50, duration: 30, intensity: 0.5 }, { delay: 50, duration: 25, intensity: 0.3 }, { delay: 50, duration: 20, intensity: 0.15 }]); onclear() }}>clear</button>
+    {:else}
+      <span class="clear-hint font-neon lowercase">press <kbd class="clear-kbd">space</kbd> to clear</span>
+    {/if}
   </div>
   <div class="mobile-comparison-scroll">
     <table class="mobile-comparison-table">
@@ -99,6 +104,27 @@
     padding: 0.25rem 0.6rem;
     font-size: 0.62rem;
     cursor: pointer;
+  }
+
+  .clear-hint {
+    font-size: 0.62rem;
+    opacity: 0.82;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .clear-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.1rem;
+    padding: 0 0.3rem;
+    border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+    background: color-mix(in srgb, var(--color-text) 6%, transparent);
+    font: inherit;
+    vertical-align: baseline;
   }
 
   .mobile-comparison-scroll {

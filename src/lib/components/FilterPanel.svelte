@@ -15,6 +15,7 @@
     evalResultsByModel: Record<string, EvalResult[]>
     onclearcomparison: () => void
     onchange: () => void
+    hasUsedTouch: boolean
   }
 
   let {
@@ -26,6 +27,7 @@
     evalResultsByModel,
     onclearcomparison,
     onchange,
+    hasUsedTouch,
   }: Props = $props()
 
   let mobileExpanded = $state(false)
@@ -159,6 +161,7 @@
             selectedModels={selectedComparisonModels}
             {evalResultsByModel}
             onclear={onclearcomparison}
+            {hasUsedTouch}
           />
         </div>
       </div>

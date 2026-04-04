@@ -21,6 +21,11 @@
   let selectedEvals = $state(new Set(untrack(() => data.evalNames)))
   let usePluses = $state(false)
   let selectedComparisonModels = $state<string[]>([])
+  let hasUsedTouch = $state(false)
+
+  function onpointerdown(e: PointerEvent) {
+    if (e.pointerType === 'touch') hasUsedTouch = true
+  }
 
   function ontogglecomparison(model: string) {
     if (selectedComparisonModels.includes(model)) {
@@ -78,6 +83,8 @@
   }
 </script>
 
+<svelte:window {onpointerdown} />
+
 <div class="w-full h-screen bg-bg">
   <FilterPanel
     modelNames={data.modelNames}
@@ -88,14 +95,17 @@
     evalResultsByModel={filteredEvalResultsByModel}
     onclearcomparison={clearcomparison}
     onchange={onFilterChange}
+    {hasUsedTouch}
   />
 
   <InfoPanel />
 
-  <div class="md:hidden fixed top-4 left-4 z-50">
-    <div class="font-neon text-[0.6rem] leading-tight lowercase text-text/50 whitespace-pre-line pointer-events-none select-none border border-border bg-bg p-2">if using touch, tap a point to preview scores
+  {#if hasUsedTouch}
+    <div class="fixed top-4 left-4 z-50">
+      <div class="font-neon text-[0.6rem] leading-tight lowercase text-text/50 whitespace-pre-line pointer-events-none select-none border border-border bg-bg p-2">tap a point to preview scores
 tap and hold to compare</div>
-  </div>
+    </div>
+  {/if}
 
   {#if __DEBUG__}
     <DebugPanel {usePluses} onchange={() => (usePluses = !usePluses)} />
