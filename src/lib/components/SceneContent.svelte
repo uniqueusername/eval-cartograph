@@ -39,6 +39,49 @@
   let activePoint = $derived(activeModel ? points.find((p) => p.model === activeModel) : null)
   let selectedModelSet = $derived(new Set(selectedComparisonModels))
 
+  // Long-press detection for mobile model selection
+  const LONG_PRESS_MS = 400
+  const LONG_PRESS_MOVE_THRESHOLD = 5
+  let pressTimer: number | null = null
+  let pressStartX = 0
+  let pressStartY = 0
+  let didLongPress = false
+  let pressedModel: string | null = null
+
+  function startLongPress(model: string, e: PointerEvent) {
+    if (!isMobile) return
+    pressedModel = model
+    pressStartX = e.clientX
+    pressStartY = e.clientY
+    didLongPress = false
+    pressTimer = window.setTimeout(() => {
+      didLongPress = true
+      ontogglecomparison(model)
+      pressTimer = null
+    }, LONG_PRESS_MS)
+  }
+
+  function cancelLongPress() {
+    if (pressTimer !== null) {
+      clearTimeout(pressTimer)
+      pressTimer = null
+    }
+    pressedModel = null
+  }
+
+  function onWindowPointerMove(e: PointerEvent) {
+    if (pressTimer === null) return
+    const dx = e.clientX - pressStartX
+    const dy = e.clientY - pressStartY
+    if (Math.abs(dx) > LONG_PRESS_MOVE_THRESHOLD || Math.abs(dy) > LONG_PRESS_MOVE_THRESHOLD) {
+      cancelLongPress()
+    }
+  }
+
+  function onWindowPointerUp() {
+    cancelLongPress()
+  }
+
   const FOG_NEAR = 0
   const FOG_FAR = 2500
 
@@ -74,6 +117,8 @@
   const axisColor = $derived($colors.axis)
   const accentColor = $derived($colors.accent)
 </script>
+
+<svelte:window onpointermove={onWindowPointerMove} onpointerup={onWindowPointerUp} />
 
 <T.OrthographicCamera
   makeDefault
@@ -147,9 +192,16 @@
         if (isMobile) return
         hoveredModel = null
       }}
+      onpointerdown={(e: any) => {
+        startLongPress(point.model, e.nativeEvent ?? e)
+      }}
       onclick={(e: any) => {
         e.stopPropagation()
         if (isMobile) {
+          if (didLongPress) {
+            didLongPress = false
+            return
+          }
           tappedModel = tappedModel === point.model ? null : point.model
         } else {
           ontogglecomparison(point.model)

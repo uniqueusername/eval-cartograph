@@ -11,30 +11,17 @@
     modelNames: string[]
     evalResultsByModel: Record<string, EvalResult[]>
     usePluses: boolean
+    selectedComparisonModels: string[]
+    ontogglecomparison: (model: string) => void
+    clearcomparison: () => void
   }
 
-  let { points, modelNames, evalResultsByModel, usePluses }: Props = $props()
-
-  let selectedComparisonModels = $state<string[]>([])
+  let { points, modelNames, evalResultsByModel, usePluses, selectedComparisonModels, ontogglecomparison, clearcomparison }: Props = $props()
 
   let activeModel: string | null = $state(null)
   let tooltipX = $state(0)
   let tooltipY = $state(0)
   let tooltipFog = $state(1)
-
-  function ontogglecomparison(model: string) {
-    if (selectedComparisonModels.includes(model)) {
-      selectedComparisonModels = selectedComparisonModels.filter((name) => name !== model)
-      return
-    }
-
-    selectedComparisonModels = [...selectedComparisonModels, model]
-  }
-
-  function clearcomparison() {
-    if (selectedComparisonModels.length === 0) return
-    selectedComparisonModels = []
-  }
 
   function onproject(model: string | null, x: number, y: number, fogFactor: number = 1) {
     activeModel = model
@@ -94,14 +81,6 @@
         cancelAnimationFrame(barAnimationFrame)
         barAnimationFrame = null
       }
-    }
-  })
-
-  $effect(() => {
-    const visibleModels = new Set(points.map((point) => point.model))
-    const nextSelectedModels = selectedComparisonModels.filter((model) => visibleModels.has(model))
-    if (nextSelectedModels.length !== selectedComparisonModels.length) {
-      selectedComparisonModels = nextSelectedModels
     }
   })
 

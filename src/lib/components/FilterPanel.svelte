@@ -1,11 +1,16 @@
 <script lang="ts">
   import SelectionPanel from "$lib/components/SelectionPanel.svelte"
+  import MobileComparisonPanel from "$lib/components/MobileComparisonPanel.svelte"
+  import type { EvalResult } from "$lib/umap"
 
   interface Props {
     modelNames: string[]
     evalNames: string[]
     selectedModels: Set<string>
     selectedEvals: Set<string>
+    selectedComparisonModels: string[]
+    evalResultsByModel: Record<string, EvalResult[]>
+    onclearcomparison: () => void
     onchange: () => void
   }
 
@@ -14,10 +19,30 @@
     evalNames,
     selectedModels,
     selectedEvals,
+    selectedComparisonModels,
+    evalResultsByModel,
+    onclearcomparison,
     onchange,
   }: Props = $props()
 
   let mobileExpanded = $state(false)
+  let mobileComparisonExpanded = $state(false)
+
+  function toggleFilters() {
+    mobileExpanded = !mobileExpanded
+    if (mobileExpanded) mobileComparisonExpanded = false
+  }
+
+  function toggleComparison() {
+    mobileComparisonExpanded = !mobileComparisonExpanded
+    if (mobileComparisonExpanded) mobileExpanded = false
+  }
+
+  let hasComparison = $derived(selectedComparisonModels.length > 0)
+
+  $effect(() => {
+    if (!hasComparison) mobileComparisonExpanded = false
+  })
 
   function toggleModel(name: string) {
     if (selectedModels.has(name)) selectedModels.delete(name)
@@ -66,16 +91,17 @@
   />
 </div>
 
-{#if mobileExpanded}
+{#if mobileExpanded || mobileComparisonExpanded}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="xl:hidden fixed inset-0 z-40"
-    onclick={() => (mobileExpanded = false)}
-    onkeydown={(e) => e.key === 'Escape' && (mobileExpanded = false)}
+    onclick={() => { mobileExpanded = false; mobileComparisonExpanded = false }}
+    onkeydown={(e) => { if (e.key === 'Escape') { mobileExpanded = false; mobileComparisonExpanded = false } }}
   ></div>
 {/if}
 
 <div class="xl:hidden fixed bottom-0 left-0 right-0 z-50 flex flex-col">
+  <!-- Filters bottom sheet -->
   <div
     class="grid transition-[grid-template-rows] duration-200 ease-out"
     class:grid-rows-[0fr]={!mobileExpanded}
@@ -111,24 +137,72 @@
     </div>
   </div>
 
-  <button
-    class="border-x-0 border-b-0 border-t border-border bg-bg p-3 font-neon text-xs font-semibold tracking-wide text-text"
-    onclick={() => (mobileExpanded = !mobileExpanded)}
+  <!-- Comparison bottom sheet -->
+  <div
+    class="grid transition-[grid-template-rows] duration-200 ease-out"
+    class:grid-rows-[0fr]={!mobileComparisonExpanded}
+    class:grid-rows-[1fr]={mobileComparisonExpanded}
   >
-    <span class="flex items-center justify-center gap-2">
-      filters
-      <svg
-        class="h-2 w-3.5 transition-transform duration-200 ease-out"
-        class:rotate-180={!mobileExpanded}
-        viewBox="-1 -1 14 10"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="square"
-        stroke-linejoin="miter"
+    <div class="overflow-hidden">
+      <div
+        class="px-2 pb-2 pt-2 h-[60vh] transition-transform duration-150 ease-out"
+        class:translate-y-full={!mobileComparisonExpanded}
+        class:translate-y-0={mobileComparisonExpanded}
       >
-        <polyline points="1,1 6,7 11,1" />
-      </svg>
-    </span>
-  </button>
+        <div class="border border-border bg-bg p-3 h-full flex flex-col min-h-0">
+          <MobileComparisonPanel
+            selectedModels={selectedComparisonModels}
+            {evalResultsByModel}
+            onclear={onclearcomparison}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer buttons -->
+  <div class="flex border-x-0 border-b-0 border-t border-border bg-bg">
+    <button
+      class="flex-1 p-3 font-neon text-xs font-semibold tracking-wide text-text"
+      onclick={toggleFilters}
+    >
+      <span class="flex items-center justify-center gap-2">
+        filters
+        <svg
+          class="h-2 w-3.5 transition-transform duration-200 ease-out"
+          class:rotate-180={!mobileExpanded}
+          viewBox="-1 -1 14 10"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="square"
+          stroke-linejoin="miter"
+        >
+          <polyline points="1,1 6,7 11,1" />
+        </svg>
+      </span>
+    </button>
+    {#if hasComparison}
+      <button
+        class="flex-1 border-l border-border p-3 font-neon text-xs font-semibold tracking-wide text-text"
+        onclick={toggleComparison}
+      >
+        <span class="flex items-center justify-center gap-2">
+          comparison
+          <svg
+            class="h-2 w-3.5 transition-transform duration-200 ease-out"
+            class:rotate-180={!mobileComparisonExpanded}
+            viewBox="-1 -1 14 10"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="square"
+            stroke-linejoin="miter"
+          >
+            <polyline points="1,1 6,7 11,1" />
+          </svg>
+        </span>
+      </button>
+    {/if}
+  </div>
 </div>

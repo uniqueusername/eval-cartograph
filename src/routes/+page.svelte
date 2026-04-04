@@ -20,6 +20,28 @@
   let selectedModels = $state(new Set(untrack(() => data.modelNames)))
   let selectedEvals = $state(new Set(untrack(() => data.evalNames)))
   let usePluses = $state(false)
+  let selectedComparisonModels = $state<string[]>([])
+
+  function ontogglecomparison(model: string) {
+    if (selectedComparisonModels.includes(model)) {
+      selectedComparisonModels = selectedComparisonModels.filter((name) => name !== model)
+      return
+    }
+    selectedComparisonModels = [...selectedComparisonModels, model]
+  }
+
+  function clearcomparison() {
+    if (selectedComparisonModels.length === 0) return
+    selectedComparisonModels = []
+  }
+
+  $effect(() => {
+    const visibleModels = new Set(points.map((point) => point.model))
+    const nextSelectedModels = selectedComparisonModels.filter((model) => visibleModels.has(model))
+    if (nextSelectedModels.length !== selectedComparisonModels.length) {
+      selectedComparisonModels = nextSelectedModels
+    }
+  })
 
   let points = $state(
     computePoints(
@@ -50,6 +72,9 @@
     evalNames={data.evalNames}
     {selectedModels}
     {selectedEvals}
+    {selectedComparisonModels}
+    evalResultsByModel={data.evalResultsByModel}
+    onclearcomparison={clearcomparison}
     onchange={onFilterChange}
   />
 
@@ -64,5 +89,8 @@
     modelNames={data.modelNames}
     evalResultsByModel={data.evalResultsByModel}
     usePluses={usePluses}
+    {selectedComparisonModels}
+    {ontogglecomparison}
+    {clearcomparison}
   />
 </div>
