@@ -3,9 +3,12 @@
   import { Billboard, interactivity, OrbitControls, Text } from "@threlte/extras"
   import { useTask } from "@threlte/core"
   import { Vector3, PlaneGeometry } from "three"
+  import { getContext } from "svelte"
   import { colors } from "$lib/colors"
   import { CAMERA_DISTANCE } from "$lib/points"
   import type { EmbeddingPoint } from "$lib/umap"
+
+  const haptics = getContext<{ trigger: Function }>("haptics")
 
   interface Props {
     points: EmbeddingPoint[]
@@ -57,6 +60,7 @@
     pressTimer = window.setTimeout(() => {
       didLongPress = true
       ontogglecomparison(model)
+      haptics.trigger("medium")
       pressTimer = null
     }, LONG_PRESS_MS)
   }

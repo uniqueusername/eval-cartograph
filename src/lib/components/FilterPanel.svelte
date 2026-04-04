@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { getContext } from "svelte"
   import SelectionPanel from "$lib/components/SelectionPanel.svelte"
   import MobileComparisonPanel from "$lib/components/MobileComparisonPanel.svelte"
   import type { EvalResult } from "$lib/umap"
+
+  const haptics = getContext<{ trigger: Function }>("haptics")
 
   interface Props {
     modelNames: string[]
@@ -31,11 +34,13 @@
   function toggleFilters() {
     mobileExpanded = !mobileExpanded
     if (mobileExpanded) mobileComparisonExpanded = false
+    haptics.trigger("light")
   }
 
   function toggleComparison() {
     mobileComparisonExpanded = !mobileComparisonExpanded
     if (mobileComparisonExpanded) mobileExpanded = false
+    haptics.trigger("light")
   }
 
   let hasComparison = $derived(selectedComparisonModels.length > 0)

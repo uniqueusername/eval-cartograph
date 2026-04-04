@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { getContext } from "svelte"
   import type { EvalResult } from "$lib/umap"
+
+  const haptics = getContext<{ trigger: Function }>("haptics")
 
   interface Props {
     selectedModels: string[]
@@ -36,7 +39,7 @@
 
 <div class="mobile-comparison">
   <div class="mobile-comparison-header">
-    <button class="clear-btn font-neon lowercase" onclick={onclear}>clear</button>
+    <button class="clear-btn font-neon lowercase" onclick={() => { haptics.trigger([{ duration: 50, intensity: 1.0 }, { delay: 50, duration: 40, intensity: 0.7 }, { delay: 50, duration: 30, intensity: 0.5 }, { delay: 50, duration: 25, intensity: 0.3 }, { delay: 50, duration: 20, intensity: 0.15 }]); onclear() }}>clear</button>
   </div>
   <div class="mobile-comparison-scroll">
     <table class="mobile-comparison-table">

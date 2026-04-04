@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { getContext } from "svelte"
   import { theme } from "$lib/theme"
+
+  const haptics = getContext<{ trigger: Function }>("haptics")
 </script>
 
 <button
-  onclick={() => theme.toggle()}
+  onclick={() => { haptics.trigger("light"); theme.toggle() }}
   class="fixed top-4 right-4 z-50 p-1 border border-[var(--color-border)] bg-[var(--color-bg)] text-text cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out theme-toggle"
   class:theme-toggle--toggled={$theme}
   aria-label="toggle dark mode"
