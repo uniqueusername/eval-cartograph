@@ -114,7 +114,6 @@
       {points}
       {modelNames}
       {usePluses}
-      {isMobile}
       {selectedComparisonModels}
       {ontogglecomparison}
       {onproject}

@@ -14,7 +14,6 @@
     points: EmbeddingPoint[]
     modelNames: string[]
     usePluses: boolean
-    isMobile: boolean
     selectedComparisonModels: string[]
     ontogglecomparison: (model: string) => void
     onproject: (model: string | null, x: number, y: number, fogFactor?: number) => void
@@ -24,7 +23,6 @@
     points,
     modelNames,
     usePluses,
-    isMobile,
     selectedComparisonModels,
     ontogglecomparison,
     onproject,
@@ -37,8 +35,9 @@
 
   let hoveredModel: string | null = $state(null)
   let tappedModel: string | null = $state(null)
+  let lastPointerType: string = 'mouse'
 
-  let activeModel = $derived(isMobile ? tappedModel : hoveredModel)
+  let activeModel = $derived(tappedModel ?? hoveredModel)
   let activePoint = $derived(activeModel ? points.find((p) => p.model === activeModel) : null)
   let selectedModelSet = $derived(new Set(selectedComparisonModels))
 
@@ -52,7 +51,7 @@
   let pressedModel: string | null = null
 
   function startLongPress(model: string, e: PointerEvent) {
-    if (!isMobile) return
+    if (e.pointerType !== 'touch') return
     pressedModel = model
     pressStartX = e.clientX
     pressStartY = e.clientY
@@ -189,19 +188,21 @@
     <T.Mesh
       onpointerenter={(e: any) => {
         e.stopPropagation()
-        if (isMobile) return
+        if ((e.nativeEvent ?? e).pointerType !== 'mouse') return
         hoveredModel = point.model
       }}
-      onpointerleave={() => {
-        if (isMobile) return
+      onpointerleave={(e: any) => {
+        if ((e.nativeEvent ?? e).pointerType !== 'mouse') return
         hoveredModel = null
       }}
       onpointerdown={(e: any) => {
-        startLongPress(point.model, e.nativeEvent ?? e)
+        const pe = e.nativeEvent ?? e
+        lastPointerType = pe.pointerType
+        startLongPress(point.model, pe)
       }}
       onclick={(e: any) => {
         e.stopPropagation()
-        if (isMobile) {
+        if (lastPointerType === 'touch') {
           if (didLongPress) {
             didLongPress = false
             return
@@ -212,7 +213,7 @@
         }
       }}
       onpointermissed={() => {
-        if (!isMobile || tappedModel === null) return
+        if (tappedModel === null) return
         tappedModel = null
       }}
     >
