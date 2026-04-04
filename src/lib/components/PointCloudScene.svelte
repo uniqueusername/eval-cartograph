@@ -88,15 +88,16 @@
     if (event.code !== "Space") return
     const target = event.target
     if (target instanceof HTMLElement) {
-      const tagName = target.tagName
       if (
         target.isContentEditable ||
-        tagName === "INPUT" ||
-        tagName === "TEXTAREA" ||
-        tagName === "SELECT" ||
-        tagName === "BUTTON"
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT"
       ) {
         return
+      }
+      // Blur buttons/checkboxes so spacebar always triggers clearcomparison
+      if (target.tagName === "BUTTON" || target.tagName === "INPUT") {
+        target.blur()
       }
     }
 
