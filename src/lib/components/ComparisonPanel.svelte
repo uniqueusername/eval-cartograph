@@ -53,9 +53,11 @@
       }
     }
 
-    // Initialize rendered evals
+    // Initialize rendered evals (no animation on first appearance)
     if (renderedEvals.length === 0 && current.length > 0) {
       renderedEvals = [...current]
+      previousEvalNames = [...current]
+      return
     }
 
     // Handle added evals
