@@ -43,6 +43,17 @@
     }
   })
 
+  function filterEvalResults(evalsSet: Set<string>): Record<string, EvalResult[]> {
+    return Object.fromEntries(
+      Object.entries(data.evalResultsByModel).map(([model, results]) => [
+        model,
+        results.filter((r) => evalsSet.has(r.evalName)),
+      ]),
+    )
+  }
+
+  let filteredEvalResultsByModel = $state(filterEvalResults(untrack(() => selectedEvals)))
+
   let points = $state(
     computePoints(
       untrack(() => data.modelNames),
@@ -63,6 +74,7 @@
       selectedEvals,
     )
     points = alignProcrustes(oldPoints, newPoints)
+    filteredEvalResultsByModel = filterEvalResults(selectedEvals)
   }
 </script>
 
@@ -73,7 +85,7 @@
     {selectedModels}
     {selectedEvals}
     {selectedComparisonModels}
-    evalResultsByModel={data.evalResultsByModel}
+    evalResultsByModel={filteredEvalResultsByModel}
     onclearcomparison={clearcomparison}
     onchange={onFilterChange}
   />
@@ -87,7 +99,7 @@
   <PointCloudScene
     {points}
     modelNames={data.modelNames}
-    evalResultsByModel={data.evalResultsByModel}
+    evalResultsByModel={filteredEvalResultsByModel}
     usePluses={usePluses}
     {selectedComparisonModels}
     {ontogglecomparison}

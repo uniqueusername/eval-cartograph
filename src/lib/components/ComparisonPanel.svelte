@@ -20,19 +20,111 @@
   const MAX_VISIBLE_MODEL_COLUMNS = 8
   const COLUMN_ENTRY_DURATION_MS = 260
   const COLUMN_EXIT_DURATION_MS = 220
+  const ROW_ENTRY_DURATION_MS = 260
+  const ROW_EXIT_DURATION_MS = 220
+
+  // Current eval names from the (filtered) data
+  let currentEvalNames = $derived.by(() => {
+    const firstModel = renderedModels[0] || selectedModels[0]
+    if (!firstModel) return []
+    return (evalResultsByModel[firstModel] ?? []).map((r) => r.evalName)
+  })
+
+  // Eval row animation state
+  let renderedEvals = $state<string[]>([])
+  let enteringEvals = $state<string[]>([])
+  let exitingEvals = $state<string[]>([])
+  let previousEvalNames: string[] = []
+  let clearEnteringEvalTimeouts = new Map<string, number>()
+  let clearExitingEvalTimeouts = new Map<string, number>()
+
+  $effect(() => {
+    const current = currentEvalNames
+
+    const addedEvals = current.filter((e) => !previousEvalNames.includes(e))
+    const removedEvals = previousEvalNames.filter((e) => !current.includes(e))
+
+    // Cancel exit for evals that came back
+    for (const evalName of current) {
+      const exitTimeout = clearExitingEvalTimeouts.get(evalName)
+      if (exitTimeout !== undefined) {
+        clearTimeout(exitTimeout)
+        clearExitingEvalTimeouts.delete(evalName)
+      }
+    }
+
+    // Initialize rendered evals
+    if (renderedEvals.length === 0 && current.length > 0) {
+      renderedEvals = [...current]
+    }
+
+    // Handle added evals
+    for (const evalName of addedEvals) {
+      if (!renderedEvals.includes(evalName)) {
+        renderedEvals = [...renderedEvals, evalName]
+      }
+      if (exitingEvals.includes(evalName)) {
+        exitingEvals = exitingEvals.filter((e) => e !== evalName)
+      }
+      if (!enteringEvals.includes(evalName)) {
+        enteringEvals = [...enteringEvals, evalName]
+      }
+      const existing = clearEnteringEvalTimeouts.get(evalName)
+      if (existing !== undefined) clearTimeout(existing)
+      const tid = window.setTimeout(() => {
+        enteringEvals = enteringEvals.filter((e) => e !== evalName)
+        clearEnteringEvalTimeouts.delete(evalName)
+      }, ROW_ENTRY_DURATION_MS)
+      clearEnteringEvalTimeouts.set(evalName, tid)
+    }
+
+    // Handle removed evals
+    for (const evalName of removedEvals) {
+      if (!renderedEvals.includes(evalName) || exitingEvals.includes(evalName)) continue
+      exitingEvals = [...exitingEvals, evalName]
+      const tid = window.setTimeout(() => {
+        renderedEvals = renderedEvals.filter((e) => e !== evalName)
+        exitingEvals = exitingEvals.filter((e) => e !== evalName)
+        clearExitingEvalTimeouts.delete(evalName)
+      }, ROW_EXIT_DURATION_MS)
+      clearExitingEvalTimeouts.set(evalName, tid)
+    }
+
+    previousEvalNames = [...current]
+  })
+
+  // Cache eval data so exiting evals can still render during animation
+  let evalDataCache = new Map<string, { displayName: string; scoresByModel: Record<string, number> }>()
 
   let rows = $derived.by<HeatmapRow[]>(() => {
-    const firstModel = renderedModels[0]
-    if (!firstModel) return []
+    // Update cache with current data
+    for (const evalName of renderedEvals) {
+      const scores: Record<string, number> = {}
+      let displayName = evalName
+      let found = false
+      for (const model of renderedModels) {
+        const results = evalResultsByModel[model] ?? []
+        const match = results.find((r) => r.evalName === evalName)
+        if (match) {
+          scores[model] = match.score
+          if (!found) { displayName = match.displayName; found = true }
+        } else {
+          scores[model] = 0
+        }
+      }
+      if (found) {
+        evalDataCache.set(evalName, { displayName, scoresByModel: scores })
+      }
+    }
 
-    const baselineResults = evalResultsByModel[firstModel] ?? []
-    return baselineResults.map((result, rowIndex) => ({
-      evalName: result.evalName,
-      displayName: result.displayName,
-      scoresByModel: Object.fromEntries(
-        renderedModels.map((model) => [model, evalResultsByModel[model]?.[rowIndex]?.score ?? 0]),
-      ),
-    }))
+    return renderedEvals.map((evalName) => {
+      const cached = evalDataCache.get(evalName)
+      return {
+        evalName,
+        displayName: cached?.displayName ?? evalName,
+        scoresByModel: cached?.scoresByModel ?? {},
+      }
+    })
   })
 
   function formatScore(score: number): string {
@@ -165,6 +257,16 @@
     }
     clearExitingTimeouts.clear()
 
+    for (const timeoutId of clearEnteringEvalTimeouts.values()) {
+      clearTimeout(timeoutId)
+    }
+    clearEnteringEvalTimeouts.clear()
+
+    for (const timeoutId of clearExitingEvalTimeouts.values()) {
+      clearTimeout(timeoutId)
+    }
+    clearExitingEvalTimeouts.clear()
+
     if (clearAllTimeout !== null) {
       clearTimeout(clearAllTimeout)
       clearAllTimeout = null
@@ -193,8 +295,10 @@
           </tr>
         </thead>
         <tbody>
-          {#each rows as row, rowIndex}
-            <tr>
+          {#each rows as row (row.evalName)}
+            {@const isRowEntering = enteringEvals.includes(row.evalName)}
+            {@const isRowExiting = exitingEvals.includes(row.evalName)}
+            <tr class={`${isRowEntering ? "row-enter" : ""} ${isRowExiting ? "row-exit" : ""}`}>
               <th class="eval-cell font-neon lowercase" title={row.evalName}>
                 <span>{row.displayName}</span>
               </th>
@@ -395,9 +499,12 @@
       width 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
       min-width 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
       max-width 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
+      height 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
       padding 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
-    opacity 180ms ease,
-    border-color 180ms ease;
+      font-size 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
+      line-height 220ms cubic-bezier(0.2, 0.86, 0.24, 1),
+      opacity 180ms ease,
+      border-color 180ms ease;
   }
 
   .column-exit {
@@ -409,6 +516,58 @@
     border-right-color: transparent !important;
     overflow: hidden !important;
     white-space: nowrap !important;
+    opacity: 0;
+  }
+
+  .row-enter {
+    animation: row-enter 260ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+  }
+
+  @keyframes row-enter {
+    from {
+      opacity: 0;
+      line-height: 0;
+    }
+
+    to {
+      opacity: 1;
+      line-height: 1.1;
+    }
+  }
+
+  .row-enter > th,
+  .row-enter > td {
+    animation: row-cell-enter 260ms cubic-bezier(0.2, 0.86, 0.24, 1) both;
+  }
+
+  @keyframes row-cell-enter {
+    from {
+      height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-bottom-color: transparent;
+    }
+
+    to {
+      height: 2rem;
+      padding-top: 0.45rem;
+      padding-bottom: 0.45rem;
+      border-bottom-color: color-mix(in srgb, var(--color-border) 45%, transparent);
+    }
+  }
+
+  .row-exit > th,
+  .row-exit > td {
+    height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom-color: transparent !important;
+    overflow: hidden !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
+  }
+
+  .row-exit {
     opacity: 0;
   }
 
