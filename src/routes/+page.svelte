@@ -92,6 +92,11 @@
 
   <InfoPanel />
 
+  <div class="md:hidden fixed top-4 left-4 z-50">
+    <div class="font-neon text-[0.6rem] leading-tight lowercase text-text/50 whitespace-pre-line pointer-events-none select-none border border-border bg-bg p-2">if using touch, tap a point to preview scores
+tap and hold to compare</div>
+  </div>
+
   {#if __DEBUG__}
     <DebugPanel {usePluses} onchange={() => (usePluses = !usePluses)} />
   {/if}

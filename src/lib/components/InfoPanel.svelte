@@ -13,8 +13,7 @@
       desktopState = "closing"
       setTimeout(() => (desktopState = "closed"), DURATION)
     } else {
-      mobileState = "closing"
-      setTimeout(() => (mobileState = "closed"), DURATION)
+      mobileState = "closed"
     }
   }
 
@@ -68,7 +67,7 @@
 
 <!-- Mobile -->
 {#if mobileState !== "closed"}
-  <div class={`xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4 ${mobileState === "closing" ? "info-overlay-exit" : ""} ${mobileState === "opening" ? "info-overlay-enter" : ""}`}>
+  <div class="xl:hidden fixed inset-0 z-50 flex items-center justify-center p-4" onclick={(e) => { if (e.target === e.currentTarget) close("mobile") }}>
     <Panel className="relative w-full max-w-sm">
       <button
         class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
@@ -81,13 +80,6 @@
       {@render socials()}
     </Panel>
   </div>
-{:else}
-  <button
-    class="xl:hidden info-button active:scale-90 transition-transform duration-150 ease-out"
-    onclick={() => open("mobile")}
-  >
-    i
-  </button>
 {/if}
 
 <style>
