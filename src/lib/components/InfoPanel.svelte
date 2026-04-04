@@ -47,7 +47,7 @@
   <div class={`info-shell hidden xl:block ${desktopState === "closing" ? "info-exit" : ""} ${desktopState === "opening" ? "info-enter" : ""}`}>
     <Panel className="relative">
       <button
-        class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
+        class="absolute bottom-2 right-2 w-5 h-5 flex items-center justify-center font-neon text-xs leading-none text-text border-none bg-transparent cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out"
         onclick={() => close("desktop")}
       >
         &times;
@@ -59,7 +59,7 @@
   </div>
 {:else}
   <button
-    class="info-button hidden xl:flex"
+    class="info-button hidden xl:flex active:scale-90 transition-transform duration-150 ease-out"
     onclick={() => open("desktop")}
   >
     i
@@ -83,7 +83,7 @@
   </div>
 {:else}
   <button
-    class="xl:hidden info-button"
+    class="xl:hidden info-button active:scale-90 transition-transform duration-150 ease-out"
     onclick={() => open("mobile")}
   >
     i
@@ -175,18 +175,10 @@
 
   .info-button:active {
     background: color-mix(in srgb, var(--color-text) 20%, var(--color-bg));
-    transform: scale(0.9);
-    transition: transform 150ms ease-out;
   }
 
   @keyframes info-button-in {
-    from {
-      opacity: 0;
-      transform: scale(0.7);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 </style>

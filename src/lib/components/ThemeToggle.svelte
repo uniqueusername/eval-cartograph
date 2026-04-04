@@ -4,7 +4,7 @@
 
 <button
   onclick={() => theme.toggle()}
-  class="fixed top-4 right-4 z-50 p-1 border-none bg-transparent text-text cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out theme-toggle"
+  class="fixed top-4 right-4 z-50 p-1 border border-[var(--color-border)] bg-[var(--color-bg)] text-text cursor-default hover:bg-black/20 active:bg-black/30 dark:hover:bg-white/20 dark:active:bg-white/30 active:scale-90 transition-transform duration-150 ease-out theme-toggle"
   class:theme-toggle--toggled={$theme}
   aria-label="toggle dark mode"
 >
